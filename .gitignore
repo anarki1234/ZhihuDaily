@@ -213,3 +213,5 @@ pip-log.txt
 
 #Mr Developer
 .mr.developer.cfg
+gen/com/kevin/zhihudaily/BuildConfig.java
+gen/com/kevin/zhihudaily/R.java
