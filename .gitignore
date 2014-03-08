@@ -215,3 +215,7 @@ pip-log.txt
 .mr.developer.cfg
 gen/com/kevin/zhihudaily/BuildConfig.java
 gen/com/kevin/zhihudaily/R.java
+
+# Temporary Directory #
+/bin/
+/gen/
