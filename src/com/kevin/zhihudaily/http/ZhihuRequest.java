@@ -30,7 +30,7 @@ public class ZhihuRequest {
      * b) 知乎日报的生日为2013年5月19日，故before/后数字小于此的只会接受到空消息
      * c) 输入的今日之后的日期仍然获得今日内容，但是格式不同于最新消息的JSON格式
      */
-    public static final String GET_OLD_NEWS = "http://news.at.zhihu.com/api/2/news/before/";
+    public static final String GET_OLD_NEWS = "http://news.at.zhihu.com/api/2/news/before/%s";
 
     /**
      * 热门消息
@@ -60,5 +60,5 @@ public class ZhihuRequest {
      *  往前：http://news-at.zhihu.com/api/2/section/2/before/1384124400 
      * （加上一个时间戳，下一个时间戳的时间详见JSON数据最后）
      */
-    public static final String GET_SECTION_BY_DATE = "http://news-at.zhihu.com/api/2/section/2/before/%l";
+    public static final String GET_SECTION_BY_DATE = "http://news-at.zhihu.com/api/2/section/2/before/%s";
 }
