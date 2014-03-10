@@ -1,17 +1,16 @@
 package com.kevin.zhihudaily.ui;
 
+import org.taptwo.android.widget.CircleFlowIndicator;
+import org.taptwo.android.widget.ViewFlow;
+
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.view.PagerAdapter;
-import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
-import android.widget.ViewFlipper;
 
 import com.kevin.zhihudaily.R;
-import com.viewpagerindicator.LinePageIndicator;
 
 public class NewsListFragment extends Fragment {
 
@@ -21,11 +20,12 @@ public class NewsListFragment extends Fragment {
     private NewsListAdapter mListAdpater;
 
     private View mHeaderView;
-    private ViewPager mPager;
-    private LinePageIndicator mIndicator;
-    private PagerAdapter mPageAdapter;
 
-    private ViewFlipper mFlipper;
+    private ViewFlow mViewFlow;
+
+    private CircleFlowIndicator mIndicator;
+
+    private TopStoryAdapter mFlowAdapter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -57,16 +57,14 @@ public class NewsListFragment extends Fragment {
             return;
         }
 
-        mPageAdapter = new StoryPageAdapter(getFragmentManager());
-
         mHeaderView = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_list_header, null);
-        //        mPager = (ViewPager) mHeaderView.findViewById(R.id.pager);
-        //        mPager.setAdapter(mPageAdapter);
-        mFlipper = (ViewFlipper) mHeaderView.findViewById(R.id.vf_story_flipper);
-        mFlipper.startFlipping();
 
-        mIndicator = (LinePageIndicator) mHeaderView.findViewById(R.id.indicator);
-        //        mIndicator.setViewPager(mPager);
+        mFlowAdapter = new TopStoryAdapter(getActivity());
+        mViewFlow = (ViewFlow) mHeaderView.findViewById(R.id.viewflow);
+        mViewFlow.setAdapter(mFlowAdapter);
+
+        mIndicator = (CircleFlowIndicator) mHeaderView.findViewById(R.id.viewflowindic);
+        mViewFlow.setFlowIndicator(mIndicator);
 
         mListView = (ListView) mRootView.findViewById(R.id.content_list);
         mListView.addHeaderView(mHeaderView);
