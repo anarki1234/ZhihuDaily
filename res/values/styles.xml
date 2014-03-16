@@ -17,8 +17,16 @@
         <!-- All customizations that are NOT specific to a particular API-level can go here. -->
     </style>
 
-    <style name="ListItemDefault">
+   	<!-- 字体相关 -->
+	<style name="Text" />
+	
+    <style name="Text.ListItemDefault">
         <item name="android:textSize">20sp</item>
         <item name="android:textColor">@android:color/black</item>
+    </style>
+    
+    <style name="Text.SectionItemDefault">
+        <item name="android:textSize">20sp</item>
+        <item name="android:textColor">@android:color/white</item>
     </style>
 </resources>

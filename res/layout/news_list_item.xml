@@ -17,7 +17,7 @@
 	    android:layout_width="match_parent"
 	    android:layout_height="wrap_content"
 	    android:layout_margin="5dp"
-	    android:textAppearance="@style/ListItemDefault"
+	    android:textAppearance="@style/Text.ListItemDefault"
 	    android:text="苹果公布汽车控制系统CarPlay"
 	    />
 </LinearLayout>

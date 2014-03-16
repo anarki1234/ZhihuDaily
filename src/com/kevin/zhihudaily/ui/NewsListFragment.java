@@ -1,23 +1,25 @@
 package com.kevin.zhihudaily.ui;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.http.Header;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.taptwo.android.widget.CircleFlowIndicator;
 
-import retrofit.Callback;
-import retrofit.RestAdapter;
-import retrofit.RetrofitError;
-import retrofit.client.Response;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ListView;
 
+import com.google.gson.Gson;
 import com.kevin.zhihudaily.R;
-import com.kevin.zhihudaily.http.ZhihuDataService;
 import com.kevin.zhihudaily.http.ZhihuRequest;
-import com.kevin.zhihudaily.model.LatestNewsModel;
+import com.kevin.zhihudaily.model.DailyNewsModel;
+import com.loopj.android.http.JsonHttpResponseHandler;
 
 public class NewsListFragment extends Fragment {
 
@@ -25,7 +27,7 @@ public class NewsListFragment extends Fragment {
 
     private View mRootView;
 
-    private ListView mListView;
+    private PinnedSectionListView mListView;
     private NewsListAdapter mListAdpater;
 
     private View mHeaderView;
@@ -35,9 +37,6 @@ public class NewsListFragment extends Fragment {
     private CircleFlowIndicator mIndicator;
 
     private TopStoryAdapter mFlowAdapter;
-
-    private RestAdapter mRestAdapter;
-    private ZhihuDataService mDataService;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -78,7 +77,7 @@ public class NewsListFragment extends Fragment {
         mIndicator = (CircleFlowIndicator) mHeaderView.findViewById(R.id.viewflowindic);
         mViewFlow.setFlowIndicator(mIndicator);
 
-        mListView = (ListView) mRootView.findViewById(R.id.content_list);
+        mListView = (PinnedSectionListView) mRootView.findViewById(R.id.content_list);
         mListView.addHeaderView(mHeaderView);
 
         mListAdpater = new NewsListAdapter(getActivity());
@@ -86,28 +85,38 @@ public class NewsListFragment extends Fragment {
         mViewFlow.setListView(mListView);
 
         // request latest news
-        mRestAdapter = new RestAdapter.Builder().setEndpoint(ZhihuRequest.BASE_URL).build();
-        mDataService = mRestAdapter.create(ZhihuDataService.class);
 
         requestLatestNews();
     }
 
     private void requestLatestNews() {
-        Callback<LatestNewsModel> callback = new Callback<LatestNewsModel>() {
+        ZhihuRequest.get(ZhihuRequest.GET_LATEST_NEWS, null, new JsonHttpResponseHandler() {
 
             @Override
-            public void failure(RetrofitError arg0) {
+            public void onFailure(int statusCode, Throwable e, JSONObject errorResponse) {
                 // TODO Auto-generated method stub
-                Log.d(TAG, "==failure==" + arg0);
+                super.onFailure(statusCode, e, errorResponse);
+                Log.e(TAG, "==onFailure==" + errorResponse);
             }
 
             @Override
-            public void success(LatestNewsModel arg0, Response arg1) {
+            public void onSuccess(int statusCode, Header[] headers, String responseBody) {
                 // TODO Auto-generated method stub
-                Log.d(TAG, "==success==" + arg0);
+                super.onSuccess(statusCode, headers, responseBody);
+                Log.d(TAG, "==onSuccess==" + responseBody);
+                Gson gson = new Gson();
+                DailyNewsModel model = gson.fromJson(responseBody, DailyNewsModel.class);
+                List<DailyNewsModel> list = new ArrayList<DailyNewsModel>();
+                list.add(model);
+                mListAdpater.updateList(list);
             }
-        };
 
-        mDataService.getLastestNews(callback);
+            @Override
+            protected Object parseResponse(String responseBody) throws JSONException {
+                // TODO Auto-generated method stub
+                return super.parseResponse(responseBody);
+            }
+
+        });
     }
 }

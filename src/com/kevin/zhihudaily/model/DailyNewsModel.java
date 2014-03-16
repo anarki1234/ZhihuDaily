@@ -6,7 +6,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class LatestNewsModel {
+public class DailyNewsModel {
 
     String date = null;
     List<NewsModel> news;
