@@ -1,18 +1,27 @@
 package com.kevin.zhihudaily.ui;
 
 import org.taptwo.android.widget.CircleFlowIndicator;
-import org.taptwo.android.widget.ViewFlow;
 
+import retrofit.Callback;
+import retrofit.RestAdapter;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
 import com.kevin.zhihudaily.R;
+import com.kevin.zhihudaily.http.ZhihuDataService;
+import com.kevin.zhihudaily.http.ZhihuRequest;
+import com.kevin.zhihudaily.model.LatestNewsModel;
 
 public class NewsListFragment extends Fragment {
+
+    protected static final String TAG = "NewsListFragment";
 
     private View mRootView;
 
@@ -21,11 +30,14 @@ public class NewsListFragment extends Fragment {
 
     private View mHeaderView;
 
-    private ViewFlow mViewFlow;
+    private HeaderViewFlow mViewFlow;
 
     private CircleFlowIndicator mIndicator;
 
     private TopStoryAdapter mFlowAdapter;
+
+    private RestAdapter mRestAdapter;
+    private ZhihuDataService mDataService;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -60,7 +72,7 @@ public class NewsListFragment extends Fragment {
         mHeaderView = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_list_header, null);
 
         mFlowAdapter = new TopStoryAdapter(getActivity());
-        mViewFlow = (ViewFlow) mHeaderView.findViewById(R.id.viewflow);
+        mViewFlow = (HeaderViewFlow) mHeaderView.findViewById(R.id.viewflow);
         mViewFlow.setAdapter(mFlowAdapter);
 
         mIndicator = (CircleFlowIndicator) mHeaderView.findViewById(R.id.viewflowindic);
@@ -71,5 +83,31 @@ public class NewsListFragment extends Fragment {
 
         mListAdpater = new NewsListAdapter(getActivity());
         mListView.setAdapter(mListAdpater);
+        mViewFlow.setListView(mListView);
+
+        // request latest news
+        mRestAdapter = new RestAdapter.Builder().setEndpoint(ZhihuRequest.BASE_URL).build();
+        mDataService = mRestAdapter.create(ZhihuDataService.class);
+
+        requestLatestNews();
+    }
+
+    private void requestLatestNews() {
+        Callback<LatestNewsModel> callback = new Callback<LatestNewsModel>() {
+
+            @Override
+            public void failure(RetrofitError arg0) {
+                // TODO Auto-generated method stub
+                Log.d(TAG, "==failure==" + arg0);
+            }
+
+            @Override
+            public void success(LatestNewsModel arg0, Response arg1) {
+                // TODO Auto-generated method stub
+                Log.d(TAG, "==success==" + arg0);
+            }
+        };
+
+        mDataService.getLastestNews(callback);
     }
 }

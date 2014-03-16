@@ -1,6 +1,5 @@
 package com.kevin.zhihudaily.model;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.json.JSONArray;
@@ -10,9 +9,9 @@ import org.json.JSONObject;
 public class LatestNewsModel {
 
     String date = null;
-    List<NewsModel> newsList = new ArrayList<NewsModel>();
+    List<NewsModel> news;
     boolean is_today = false;
-    List<NewsModel> storieList = new ArrayList<NewsModel>();
+    List<NewsModel> top_stories;
     String display_date = null;
 
     public String getDate() {
@@ -24,11 +23,11 @@ public class LatestNewsModel {
     }
 
     public List<NewsModel> getNewsList() {
-        return newsList;
+        return news;
     }
 
-    public void setNewsList(List<NewsModel> newsList) {
-        this.newsList = newsList;
+    public void setNewsList(List<NewsModel> news) {
+        this.news = news;
     }
 
     public boolean isIs_today() {
@@ -40,11 +39,11 @@ public class LatestNewsModel {
     }
 
     public List<NewsModel> getTopStories() {
-        return storieList;
+        return top_stories;
     }
 
-    public void setTopStories(List<NewsModel> topStories) {
-        this.storieList = topStories;
+    public void setTopStories(List<NewsModel> top_stories) {
+        this.top_stories = top_stories;
     }
 
     public String getDisplay_date() {
@@ -66,7 +65,7 @@ public class LatestNewsModel {
             for (int i = 0; i < size; i++) {
                 NewsModel model = new NewsModel();
                 model.parseJSON(newsaArray.getJSONObject(i));
-                this.newsList.add(model);
+                this.news.add(model);
             }
 
             JSONArray storiesArray = json.getJSONArray("top_stories");
@@ -74,7 +73,7 @@ public class LatestNewsModel {
             for (int i = 0; i < size; i++) {
                 NewsModel model = new NewsModel();
                 model.parseJSON(storiesArray.getJSONObject(i));
-                this.storieList.add(model);
+                this.top_stories.add(model);
             }
         } catch (JSONException e) {
             // TODO Auto-generated catch block

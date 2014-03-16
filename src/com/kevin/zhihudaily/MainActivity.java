@@ -51,7 +51,6 @@ public class MainActivity extends ActionBarActivity {
         // enable ActionBar app icon to behave as action to toggle nav drawer
         getActionBar().setDisplayHomeAsUpEnabled(true);
         getActionBar().setHomeButtonEnabled(true);
-
         //        getActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#330000ff")));
 
         // ActionBarDrawerToggle ties together the the proper interactions

@@ -2,6 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:padding="3dp"
     android:background="@android:color/white"
     android:orientation="horizontal" >
     <ImageView 
@@ -16,7 +17,7 @@
 	    android:layout_width="match_parent"
 	    android:layout_height="wrap_content"
 	    android:layout_margin="5dp"
-	    android:textAppearance="@android:attr/textAppearanceLarge"
+	    android:textAppearance="@style/ListItemDefault"
 	    android:text="苹果公布汽车控制系统CarPlay"
 	    />
 </LinearLayout>

@@ -4,7 +4,13 @@
 	android:orientation="vertical" 
 	android:layout_width="match_parent"
 	android:layout_height="wrap_content" >
-	<org.taptwo.android.widget.ViewFlow
+<!-- 	<org.taptwo.android.widget.ViewFlow -->
+<!-- 	    android:id="@+id/viewflow" -->
+<!-- 		android:layout_width="wrap_content" -->
+<!-- 		android:layout_height="250dp"  -->
+<!-- 		app:sidebuffer="3" -->
+<!-- 		/> -->
+	<com.kevin.zhihudaily.ui.HeaderViewFlow
 	    android:id="@+id/viewflow"
 		android:layout_width="wrap_content"
 		android:layout_height="250dp" 
