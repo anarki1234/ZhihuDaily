@@ -219,3 +219,5 @@ gen/com/kevin/zhihudaily/R.java
 # Temporary Directory #
 /bin/
 /gen/
+
+project.properties
