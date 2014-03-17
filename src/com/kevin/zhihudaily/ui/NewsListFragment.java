@@ -23,100 +23,109 @@ import com.loopj.android.http.JsonHttpResponseHandler;
 
 public class NewsListFragment extends Fragment {
 
-    protected static final String TAG = "NewsListFragment";
+	protected static final String TAG = "NewsListFragment";
 
-    private View mRootView;
+	private View mRootView;
 
-    private PinnedSectionListView mListView;
-    private NewsListAdapter mListAdpater;
+	private MainListView mListView;
+	private NewsListAdapter mListAdpater;
 
-    private View mHeaderView;
+	private View mHeaderView;
 
-    private HeaderViewFlow mViewFlow;
+	private HeaderViewFlow mViewFlow;
 
-    private CircleFlowIndicator mIndicator;
+	private CircleFlowIndicator mIndicator;
 
-    private TopStoryAdapter mFlowAdapter;
+	private TopStoryAdapter mFlowAdapter;
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        // TODO Auto-generated method stub
-        mRootView = inflater.inflate(R.layout.fragment_news_list, container, false);
-        return mRootView;
-        //        return super.onCreateView(inflater, container, savedInstanceState);
-    }
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+			Bundle savedInstanceState) {
+		// TODO Auto-generated method stub
+		mRootView = inflater.inflate(R.layout.fragment_news_list, container,
+				false);
+		return mRootView;
+		// return super.onCreateView(inflater, container, savedInstanceState);
+	}
 
-    @Override
-    public void onDestroyView() {
-        // TODO Auto-generated method stub
-        super.onDestroyView();
+	@Override
+	public void onDestroyView() {
+		// TODO Auto-generated method stub
+		super.onDestroyView();
 
-        mRootView = null;
-    }
+		mRootView = null;
+	}
 
-    @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-        // TODO Auto-generated method stub
-        super.onViewCreated(view, savedInstanceState);
+	@Override
+	public void onViewCreated(View view, Bundle savedInstanceState) {
+		// TODO Auto-generated method stub
+		super.onViewCreated(view, savedInstanceState);
 
-        // set up views()
-        initViews();
-    }
+		// set up views()
+		initViews();
+	}
 
-    private void initViews() {
-        if (mRootView == null) {
-            return;
-        }
+	private void initViews() {
+		if (mRootView == null) {
+			return;
+		}
 
-        mHeaderView = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_list_header, null);
+		mHeaderView = LayoutInflater.from(getActivity()).inflate(
+				R.layout.fragment_list_header, null);
 
-        mFlowAdapter = new TopStoryAdapter(getActivity());
-        mViewFlow = (HeaderViewFlow) mHeaderView.findViewById(R.id.viewflow);
-        mViewFlow.setAdapter(mFlowAdapter);
+		mFlowAdapter = new TopStoryAdapter(getActivity());
+		mViewFlow = (HeaderViewFlow) mHeaderView.findViewById(R.id.viewflow);
+		mViewFlow.setAdapter(mFlowAdapter);
 
-        mIndicator = (CircleFlowIndicator) mHeaderView.findViewById(R.id.viewflowindic);
-        mViewFlow.setFlowIndicator(mIndicator);
+		mIndicator = (CircleFlowIndicator) mHeaderView
+				.findViewById(R.id.viewflowindic);
+		mViewFlow.setFlowIndicator(mIndicator);
 
-        mListView = (PinnedSectionListView) mRootView.findViewById(R.id.content_list);
-        mListView.addHeaderView(mHeaderView);
+		mListView = (MainListView) mRootView.findViewById(R.id.content_list);
+		mListView.addHeaderView(mHeaderView);
 
-        mListAdpater = new NewsListAdapter(getActivity());
-        mListView.setAdapter(mListAdpater);
-        mViewFlow.setListView(mListView);
+		mListAdpater = new NewsListAdapter(getActivity());
+		mListView.setAdapter(mListAdpater);
+		mViewFlow.setListView(mListView);
 
-        // request latest news
+		// request latest news
 
-        requestLatestNews();
-    }
+		requestLatestNews();
+	}
 
-    private void requestLatestNews() {
-        ZhihuRequest.get(ZhihuRequest.GET_LATEST_NEWS, null, new JsonHttpResponseHandler() {
+	private void requestLatestNews() {
+		ZhihuRequest.get(ZhihuRequest.GET_LATEST_NEWS, null,
+				new JsonHttpResponseHandler() {
 
-            @Override
-            public void onFailure(int statusCode, Throwable e, JSONObject errorResponse) {
-                // TODO Auto-generated method stub
-                super.onFailure(statusCode, e, errorResponse);
-                Log.e(TAG, "==onFailure==" + errorResponse);
-            }
+					@Override
+					public void onFailure(int statusCode, Throwable e,
+							JSONObject errorResponse) {
+						// TODO Auto-generated method stub
+						super.onFailure(statusCode, e, errorResponse);
+						Log.e(TAG, "==onFailure==" + errorResponse);
+					}
 
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, String responseBody) {
-                // TODO Auto-generated method stub
-                super.onSuccess(statusCode, headers, responseBody);
-                Log.d(TAG, "==onSuccess==" + responseBody);
-                Gson gson = new Gson();
-                DailyNewsModel model = gson.fromJson(responseBody, DailyNewsModel.class);
-                List<DailyNewsModel> list = new ArrayList<DailyNewsModel>();
-                list.add(model);
-                mListAdpater.updateList(list);
-            }
+					@Override
+					public void onSuccess(int statusCode, Header[] headers,
+							String responseBody) {
+						// TODO Auto-generated method stub
+						super.onSuccess(statusCode, headers, responseBody);
+						Log.d(TAG, "==onSuccess==" + responseBody);
+						Gson gson = new Gson();
+						DailyNewsModel model = gson.fromJson(responseBody,
+								DailyNewsModel.class);
+						List<DailyNewsModel> list = new ArrayList<DailyNewsModel>();
+						list.add(model);
+						mListAdpater.updateList(list);
+					}
 
-            @Override
-            protected Object parseResponse(String responseBody) throws JSONException {
-                // TODO Auto-generated method stub
-                return super.parseResponse(responseBody);
-            }
+					@Override
+					protected Object parseResponse(String responseBody)
+							throws JSONException {
+						// TODO Auto-generated method stub
+						return super.parseResponse(responseBody);
+					}
 
-        });
-    }
+				});
+	}
 }

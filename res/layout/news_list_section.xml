@@ -9,7 +9,7 @@
         android:id="@+id/tv_section_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:padding="5dp"
+        android:padding="7dp"
         android:textAppearance="@style/Text.SectionItemDefault"
         android:background="@color/blue_main"
         android:text="2014.3.6 星期四"
