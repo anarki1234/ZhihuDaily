@@ -6,6 +6,7 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.kevin.zhihudaily.model.DailyNewsModel;
+import com.kevin.zhihudaily.model.NewsModel;
 
 public class DataBaseManager {
     private DataBaseHelper mHelper;
@@ -40,11 +41,11 @@ public class DataBaseManager {
         return count;
     }
 
-    public List<DailyNewsModel> readDaliyNewsList() {
+    public List<DailyNewsModel> readDaliyNewsList(String date) {
         return null;
     }
 
-    public List<DailyNewsModel> readNewsDetail() {
+    public List<NewsModel> readNewsDetail(String date) {
         return null;
     }
 }
