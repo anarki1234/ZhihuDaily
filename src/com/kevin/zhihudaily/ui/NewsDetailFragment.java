@@ -9,40 +9,53 @@ import android.view.ViewGroup;
 import com.kevin.zhihudaily.R;
 
 public class NewsDetailFragment extends Fragment {
-	private View mRootView;
+    private View mRootView;
 
-	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-			Bundle savedInstanceState) {
-		// TODO Auto-generated method stub
-		mRootView = inflater.inflate(R.layout.fragment_news_detail, container,
-				false);
+    public static NewsDetailFragment newInstance() {
+        final NewsDetailFragment detailFragment = new NewsDetailFragment();
 
-		return mRootView;
-	}
+        final Bundle args = new Bundle();
 
-	@Override
-	public void onDestroyView() {
-		// TODO Auto-generated method stub
-		super.onDestroyView();
+        detailFragment.setArguments(args);
+        return detailFragment;
+    }
 
-		mRootView = null;
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        // TODO Auto-generated method stub
+        super.onCreate(savedInstanceState);
+    }
 
-	}
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        // TODO Auto-generated method stub
+        mRootView = inflater.inflate(R.layout.fragment_news_detail, container, false);
 
-	@Override
-	public void onViewCreated(View view, Bundle savedInstanceState) {
-		// TODO Auto-generated method stub
-		super.onViewCreated(view, savedInstanceState);
+        return mRootView;
+    }
 
-		// init up views
-		initViews();
-	}
+    @Override
+    public void onDestroyView() {
+        // TODO Auto-generated method stub
+        super.onDestroyView();
 
-	private void initViews() {
-		if (mRootView == null) {
-			return;
-		}
+        mRootView = null;
 
-	}
+    }
+
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        // TODO Auto-generated method stub
+        super.onViewCreated(view, savedInstanceState);
+
+        // init up views
+        initViews();
+    }
+
+    private void initViews() {
+        if (mRootView == null) {
+            return;
+        }
+
+    }
 }
