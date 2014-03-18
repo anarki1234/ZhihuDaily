@@ -33,6 +33,7 @@ public class MainActivity extends ActionBarActivity {
     private CharSequence mDrawerTitle;
     private CharSequence mTitle;
     private String[] mMenuTitles;
+    private DataBaseManager mDBManager;
 
     @SuppressLint("NewApi")
     @Override
@@ -85,7 +86,14 @@ public class MainActivity extends ActionBarActivity {
         }
 
         // init database
-        DataBaseManager manager = new DataBaseManager(getApplicationContext());
+        DataBaseManager.newInstance(getApplicationContext());
+    }
+
+    @Override
+    protected void onDestroy() {
+        // TODO Auto-generated method stub
+        DataBaseManager.getInstance().closeDB();
+        super.onDestroy();
     }
 
     @Override

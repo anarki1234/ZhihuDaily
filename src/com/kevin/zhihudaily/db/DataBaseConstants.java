@@ -17,8 +17,7 @@ public class DataBaseConstants implements BaseColumns {
     private static final String INTEGER_TYPE = "INTEGER";
 
     public static final String NEWS_TABLE_NAME = "NewsData";
-    public static final String ROW_ID = "_id";
-    public static final String ZHIHU_ID = "id";
+    public static final String ID = "id";
     public static final String DATE = "date";
     public static final String GA_PREFIX = "ga_prefix";
     public static final String IS_TOP_STORY = "is_top_story";
@@ -32,10 +31,8 @@ public class DataBaseConstants implements BaseColumns {
     public static final String CSS = "css";
     public static final String JS = "js";
 
-    public static final String CREATE_NEWS_TABLE = "CREATE TABLE" + " " + NEWS_TABLE_NAME + " " //
-            + "(" + " " //
-            + ROW_ID + " " + PRIMARY_KEY_TYPE + " ," //
-            + ZHIHU_ID + " " + TEXT_TYPE + "," //
+    public static final String CREATE_NEWS_TABLE = "CREATE TABLE if not Exists [" + NEWS_TABLE_NAME + "] ( " //
+            + ID + " " + PRIMARY_KEY_TYPE + " ," //
             + DATE + " " + TEXT_TYPE + " ," //
             + GA_PREFIX + " " + TEXT_TYPE + " ," //
             + IS_TOP_STORY + " " + INTEGER_TYPE + " DEFAULT 0," //
