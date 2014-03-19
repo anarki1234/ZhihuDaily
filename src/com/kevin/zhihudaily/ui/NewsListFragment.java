@@ -8,6 +8,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.taptwo.android.widget.CircleFlowIndicator;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -17,115 +18,125 @@ import android.view.ViewGroup;
 
 import com.google.gson.Gson;
 import com.kevin.zhihudaily.R;
+import com.kevin.zhihudaily.db.DataBaseManager;
+import com.kevin.zhihudaily.db.DataCache;
+import com.kevin.zhihudaily.http.DataService;
 import com.kevin.zhihudaily.http.ZhihuRequest;
 import com.kevin.zhihudaily.model.DailyNewsModel;
 import com.loopj.android.http.JsonHttpResponseHandler;
 
 public class NewsListFragment extends Fragment {
 
-	protected static final String TAG = "NewsListFragment";
+    protected static final String TAG = "NewsListFragment";
 
-	private View mRootView;
+    private View mRootView;
 
-	private MainListView mListView;
-	private NewsListAdapter mListAdpater;
+    private MainListView mListView;
+    private NewsListAdapter mListAdpater;
 
-	private View mHeaderView;
+    private View mHeaderView;
 
-	private HeaderViewFlow mViewFlow;
+    private HeaderViewFlow mViewFlow;
 
-	private CircleFlowIndicator mIndicator;
+    private CircleFlowIndicator mIndicator;
 
-	private TopStoryAdapter mFlowAdapter;
+    private TopStoryAdapter mFlowAdapter;
 
-	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-			Bundle savedInstanceState) {
-		// TODO Auto-generated method stub
-		mRootView = inflater.inflate(R.layout.fragment_news_list, container,
-				false);
-		return mRootView;
-		// return super.onCreateView(inflater, container, savedInstanceState);
-	}
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        // TODO Auto-generated method stub
+        mRootView = inflater.inflate(R.layout.fragment_news_list, container, false);
+        return mRootView;
+        // return super.onCreateView(inflater, container, savedInstanceState);
+    }
 
-	@Override
-	public void onDestroyView() {
-		// TODO Auto-generated method stub
-		super.onDestroyView();
+    @Override
+    public void onDestroyView() {
+        // TODO Auto-generated method stub
+        super.onDestroyView();
 
-		mRootView = null;
-	}
+        mRootView = null;
+    }
 
-	@Override
-	public void onViewCreated(View view, Bundle savedInstanceState) {
-		// TODO Auto-generated method stub
-		super.onViewCreated(view, savedInstanceState);
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        // TODO Auto-generated method stub
+        super.onViewCreated(view, savedInstanceState);
 
-		// set up views()
-		initViews();
-	}
+        // set up views()
+        initViews();
+    }
 
-	private void initViews() {
-		if (mRootView == null) {
-			return;
-		}
+    private void initViews() {
+        if (mRootView == null) {
+            return;
+        }
 
-		mHeaderView = LayoutInflater.from(getActivity()).inflate(
-				R.layout.fragment_list_header, null);
+        mHeaderView = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_list_header, null);
 
-		mFlowAdapter = new TopStoryAdapter(getActivity());
-		mViewFlow = (HeaderViewFlow) mHeaderView.findViewById(R.id.viewflow);
-		mViewFlow.setAdapter(mFlowAdapter);
+        mFlowAdapter = new TopStoryAdapter(getActivity());
+        mViewFlow = (HeaderViewFlow) mHeaderView.findViewById(R.id.viewflow);
+        mViewFlow.setAdapter(mFlowAdapter);
 
-		mIndicator = (CircleFlowIndicator) mHeaderView
-				.findViewById(R.id.viewflowindic);
-		mViewFlow.setFlowIndicator(mIndicator);
+        mIndicator = (CircleFlowIndicator) mHeaderView.findViewById(R.id.viewflowindic);
+        mViewFlow.setFlowIndicator(mIndicator);
 
-		mListView = (MainListView) mRootView.findViewById(R.id.content_list);
-		mListView.addHeaderView(mHeaderView);
+        mListView = (MainListView) mRootView.findViewById(R.id.content_list);
+        mListView.addHeaderView(mHeaderView);
 
-		mListAdpater = new NewsListAdapter(getActivity());
-		mListView.setAdapter(mListAdpater);
-		mViewFlow.setListView(mListView);
+        mListAdpater = new NewsListAdapter(getActivity());
+        mListView.setAdapter(mListAdpater);
+        mViewFlow.setListView(mListView);
 
-		// request latest news
+        // request latest news
 
-		requestLatestNews();
-	}
+        requestLatestNews();
+    }
 
-	private void requestLatestNews() {
-		ZhihuRequest.get(ZhihuRequest.GET_LATEST_NEWS, null,
-				new JsonHttpResponseHandler() {
+    private void requestLatestNews() {
+        ZhihuRequest.get(ZhihuRequest.GET_LATEST_NEWS, null, new JsonHttpResponseHandler() {
 
-					@Override
-					public void onFailure(int statusCode, Throwable e,
-							JSONObject errorResponse) {
-						// TODO Auto-generated method stub
-						super.onFailure(statusCode, e, errorResponse);
-						Log.e(TAG, "==onFailure==" + errorResponse);
-					}
+            @Override
+            public void onFailure(int statusCode, Throwable e, JSONObject errorResponse) {
+                // TODO Auto-generated method stub
+                super.onFailure(statusCode, e, errorResponse);
+                Log.e(TAG, "==onFailure==" + errorResponse);
+            }
 
-					@Override
-					public void onSuccess(int statusCode, Header[] headers,
-							String responseBody) {
-						// TODO Auto-generated method stub
-						super.onSuccess(statusCode, headers, responseBody);
-						Log.d(TAG, "==onSuccess==" + responseBody);
-						Gson gson = new Gson();
-						DailyNewsModel model = gson.fromJson(responseBody,
-								DailyNewsModel.class);
-						List<DailyNewsModel> list = new ArrayList<DailyNewsModel>();
-						list.add(model);
-						mListAdpater.updateList(list);
-					}
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, String responseBody) {
+                // TODO Auto-generated method stub
+                super.onSuccess(statusCode, headers, responseBody);
+                Log.d(TAG, "==onSuccess==" + responseBody);
+                Gson gson = new Gson();
+                DailyNewsModel model = gson.fromJson(responseBody, DailyNewsModel.class);
+                List<DailyNewsModel> list = new ArrayList<DailyNewsModel>();
+                list.add(model);
 
-					@Override
-					protected Object parseResponse(String responseBody)
-							throws JSONException {
-						// TODO Auto-generated method stub
-						return super.parseResponse(responseBody);
-					}
+                mListAdpater.updateList(list);
 
-				});
-	}
+                int newTimeStamp = Integer.valueOf(list.get(0).getNewsList().get(0).getGa_prefix());
+                if (DataBaseManager.getInstance().checkDataExpire(newTimeStamp)) {
+                    // add to cache and write to db
+                    DataCache.getInstance().addDailyCache(list.hashCode(), list);
+                    Intent intent = new Intent(getActivity(), DataService.class);
+                    intent.putExtra(DataService.INTENT_CACHE_ID, list.hashCode());
+                    intent.putExtra(DataService.INTENT_ACTION_TYPE, DataService.ACTION_WRITE_DAILY_NEWS);
+                    getActivity().startService(intent);
+
+                    // update timestamp
+                    DataBaseManager.getInstance().setDataTimeStamp(newTimeStamp);
+                }
+
+            }
+
+            @Override
+            protected Object parseResponse(String responseBody) throws JSONException {
+                // TODO Auto-generated method stub
+                return super.parseResponse(responseBody);
+            }
+
+        });
+    }
+
 }

@@ -23,6 +23,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.kevin.zhihudaily.db.DataBaseManager;
+import com.kevin.zhihudaily.db.DataCache;
 import com.kevin.zhihudaily.ui.NewsListFragment;
 
 public class MainActivity extends ActionBarActivity {
@@ -93,6 +94,7 @@ public class MainActivity extends ActionBarActivity {
     protected void onDestroy() {
         // TODO Auto-generated method stub
         DataBaseManager.getInstance().closeDB();
+        DataCache.getInstance().clearAllCache();
         super.onDestroy();
     }
 
@@ -185,4 +187,5 @@ public class MainActivity extends ActionBarActivity {
         // Pass any configuration change to the drawer toggls
         mDrawerToggle.onConfigurationChanged(newConfig);
     }
+
 }

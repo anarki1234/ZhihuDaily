@@ -4,12 +4,13 @@ import android.provider.BaseColumns;
 
 public class DataBaseConstants implements BaseColumns {
 
-    private DataBaseConstants() {
-
-    }
-
+    public static final String SHARED_PREFERENCES_NAME = "timestamp";
     public static final String DATABASE_NAME = "news.db";
     public static final int DATABASE_VERSION = 1;
+
+    // data update timestamp id
+    public static int TIME_STAMP_ID = 0;
+    public static final String SP_TIME_STAMP = "timestamp";
 
     // Constants for building SQLite tables during initialization
     private static final String TEXT_TYPE = "TEXT";
