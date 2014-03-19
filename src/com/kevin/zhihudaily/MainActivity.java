@@ -34,7 +34,6 @@ public class MainActivity extends ActionBarActivity {
     private CharSequence mDrawerTitle;
     private CharSequence mTitle;
     private String[] mMenuTitles;
-    private DataBaseManager mDBManager;
 
     @SuppressLint("NewApi")
     @Override

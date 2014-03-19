@@ -1,12 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.kevin.zhihudaily.ui.ExScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical" >
-
-   	<android.support.v4.view.ViewPager
-            android:id="@+id/pager"
-            android:layout_width="match_parent"
-            android:layout_height="0px"
-            android:layout_weight="1" />
-</LinearLayout>
+    <LinearLayout 
+	    android:layout_width="match_parent"
+	    android:layout_height="match_parent"
+	    android:orientation="vertical">
+		<ImageView 
+		    android:id="@+id/iv_image"
+		    android:layout_width="match_parent"
+		    android:layout_height="200dp"
+		    android:scaleType="centerCrop"
+		    android:src="@drawable/ic_header"
+		    />
+	   	<com.kevin.zhihudaily.ui.ExWebView 
+	   	    android:id="@+id/wv_webview"
+	   	    android:layout_width="match_parent"
+	   	    android:layout_height="wrap_content"
+	   	    />
+        
+    </LinearLayout>
+</com.kevin.zhihudaily.ui.ExScrollView>

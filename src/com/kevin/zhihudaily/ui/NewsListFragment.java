@@ -17,10 +17,11 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.google.gson.Gson;
+import com.kevin.zhihudaily.Constants;
 import com.kevin.zhihudaily.R;
 import com.kevin.zhihudaily.db.DataBaseManager;
 import com.kevin.zhihudaily.db.DataCache;
-import com.kevin.zhihudaily.http.DataService;
+import com.kevin.zhihudaily.db.DataService;
 import com.kevin.zhihudaily.http.ZhihuRequest;
 import com.kevin.zhihudaily.model.DailyNewsModel;
 import com.loopj.android.http.JsonHttpResponseHandler;
@@ -115,13 +116,15 @@ public class NewsListFragment extends Fragment {
 
                 mListAdpater.updateList(list);
 
+                mFlowAdapter.updateList(list.get(0).getTopStories());
+
                 int newTimeStamp = Integer.valueOf(list.get(0).getNewsList().get(0).getGa_prefix());
                 if (DataBaseManager.getInstance().checkDataExpire(newTimeStamp)) {
                     // add to cache and write to db
                     DataCache.getInstance().addDailyCache(list.hashCode(), list);
                     Intent intent = new Intent(getActivity(), DataService.class);
-                    intent.putExtra(DataService.INTENT_CACHE_ID, list.hashCode());
-                    intent.putExtra(DataService.INTENT_ACTION_TYPE, DataService.ACTION_WRITE_DAILY_NEWS);
+                    intent.putExtra(Constants.INTENT_CACHE_ID, list.hashCode());
+                    intent.putExtra(Constants.INTENT_ACTION_TYPE, Constants.ACTION_WRITE_DAILY_NEWS);
                     getActivity().startService(intent);
 
                     // update timestamp

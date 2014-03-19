@@ -1,6 +1,8 @@
 package com.kevin.zhihudaily.ui;
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.List;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -11,10 +13,13 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.kevin.zhihudaily.R;
+import com.kevin.zhihudaily.model.NewsModel;
+import com.squareup.picasso.Picasso;
 
 public class TopStoryAdapter extends BaseAdapter {
 
     private WeakReference<Context> mContextWR;
+    private List<NewsModel> mDataList;
 
     static class ViewHolder {
         public ImageView imageView;
@@ -23,24 +28,51 @@ public class TopStoryAdapter extends BaseAdapter {
 
     public TopStoryAdapter(Context context) {
         this.mContextWR = new WeakReference<Context>(context);
+        mDataList = new ArrayList<NewsModel>();
+    }
+
+    public void updateList(List<NewsModel> list) {
+        if (list == null) {
+            return;
+        }
+
+        mDataList.addAll(list);
+
+        // notify ui
+        notifyDataSetChanged();
+
+    }
+
+    public void updateAllList(List<NewsModel> list) {
+        if (list == null) {
+            return;
+        }
+
+        // clear all data
+        mDataList.clear();
+
+        mDataList.addAll(list);
+
+        // notify ui
+        notifyDataSetChanged();
     }
 
     @Override
     public int getCount() {
         // TODO Auto-generated method stub
-        return 5;
+        return mDataList.size() > 5 ? mDataList.size() : 5;
     }
 
     @Override
     public Object getItem(int position) {
         // TODO Auto-generated method stub
-        return null;
+        return mDataList.get(position);
     }
 
     @Override
     public long getItemId(int position) {
         // TODO Auto-generated method stub
-        return 0;
+        return position;
     }
 
     @Override
@@ -65,6 +97,12 @@ public class TopStoryAdapter extends BaseAdapter {
     }
 
     private void setupFlowView(ViewHolder holder, int position) {
+        if (mDataList == null || mDataList.size() == 0) {
+            return;
+        }
 
+        NewsModel model = mDataList.get(position);
+        Picasso.with(mContextWR.get()).load(model.getImage()).placeholder(R.drawable.ic_header).fit()
+                .into(holder.imageView);
     }
 }

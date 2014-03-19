@@ -5,11 +5,14 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 
 import com.kevin.zhihudaily.R;
 
 public class NewsDetailFragment extends Fragment {
     private View mRootView;
+    private ImageView mImageView;
+    private ExWebView mWebView;
 
     public static NewsDetailFragment newInstance() {
         final NewsDetailFragment detailFragment = new NewsDetailFragment();
@@ -56,6 +59,10 @@ public class NewsDetailFragment extends Fragment {
         if (mRootView == null) {
             return;
         }
+
+        mImageView = (ImageView) mRootView.findViewById(R.id.iv_image);
+
+        mWebView = (ExWebView) mRootView.findViewById(R.id.wv_webview);
 
     }
 }

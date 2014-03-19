@@ -1,6 +1,5 @@
 package com.kevin.zhihudaily.db;
 
-import java.util.HashMap;
 import java.util.List;
 
 import android.content.ContentValues;
@@ -9,6 +8,7 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
+import android.util.SparseBooleanArray;
 
 import com.kevin.zhihudaily.model.DailyNewsModel;
 import com.kevin.zhihudaily.model.NewsModel;
@@ -90,7 +90,7 @@ public class DataBaseManager {
                 String date = dailyNewsModel.getDate();
 
                 List<NewsModel> topList = dailyNewsModel.getTopStories();
-                HashMap<Integer, Boolean> topIDMap = new HashMap<Integer, Boolean>();
+                SparseBooleanArray topIDMap = new SparseBooleanArray();
                 for (NewsModel topModel : topList) {
                     topIDMap.put(topModel.getId(), true);
                 }
@@ -100,7 +100,7 @@ public class DataBaseManager {
                     ContentValues values = new ContentValues();
                     values.put(DataBaseConstants.ID, model.getId());
                     values.put(DataBaseConstants.DATE, date);
-                    if (topIDMap.containsKey(model.getId())) {
+                    if (topIDMap.get(model.getId())) {
                         values.put(DataBaseConstants.IS_TOP_STORY, 1);
                     } else {
                         values.put(DataBaseConstants.IS_TOP_STORY, 0);
@@ -115,7 +115,7 @@ public class DataBaseManager {
                     values.put(DataBaseConstants.SHARE_URL, model.getShare_url());
                     values.put(DataBaseConstants.BODY, model.getBody());
 
-                    long rowid = db.insertWithOnConflict(DataBaseConstants.NEWS_TABLE_NAME, null, values,
+                    db.insertWithOnConflict(DataBaseConstants.NEWS_TABLE_NAME, null, values,
                             SQLiteDatabase.CONFLICT_REPLACE);
                 }
             }

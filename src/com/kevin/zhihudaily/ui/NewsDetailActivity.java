@@ -16,6 +16,7 @@ import android.view.View.OnClickListener;
 import android.view.WindowManager.LayoutParams;
 
 import com.kevin.zhihudaily.BuildConfig;
+import com.kevin.zhihudaily.Constants;
 import com.kevin.zhihudaily.R;
 import com.kevin.zhihudaily.imageutil.Utils;
 
@@ -23,7 +24,7 @@ public class NewsDetailActivity extends FragmentActivity implements OnClickListe
 
     private DetailPagerAdapter mAdapter;
     private ViewPager mPager;
-    private int mNewsSize;
+    private int mNewsNum = 1;
 
     @SuppressLint("NewApi")
     @Override
@@ -45,11 +46,11 @@ public class NewsDetailActivity extends FragmentActivity implements OnClickListe
 
         Intent intent = getIntent();
         if (intent != null) {
-            //            mNewsSize = savedInstanceState.getb
+            mNewsNum = getIntent().getIntExtra(Constants.INTENT_NEWS_NUM, 1);
         }
 
         // Set up ViewPager and backing adapter
-        mAdapter = new DetailPagerAdapter(getSupportFragmentManager(), 10);
+        mAdapter = new DetailPagerAdapter(getSupportFragmentManager(), mNewsNum);
         mPager = (ViewPager) findViewById(R.id.pager);
         mPager.setAdapter(mAdapter);
         mPager.setPageMargin((int) getResources().getDimension(R.dimen.news_detail_pager_margin));
@@ -85,10 +86,10 @@ public class NewsDetailActivity extends FragmentActivity implements OnClickListe
         }
 
         // Set the current item based on the extra passed in to this activity
-        //        final int extraCurrentItem = getIntent().getIntExtra(EXTRA_IMAGE, -1);
-        //        if (extraCurrentItem != -1) {
-        //            mPager.setCurrentItem(extraCurrentItem);
-        //        }
+        final int extraCurrentItem = getIntent().getIntExtra(Constants.INTENT_NEWS_INDEX, -1);
+        if (extraCurrentItem != -1) {
+            mPager.setCurrentItem(extraCurrentItem);
+        }
     }
 
     @Override
