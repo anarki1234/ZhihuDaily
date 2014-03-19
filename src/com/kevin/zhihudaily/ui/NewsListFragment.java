@@ -15,6 +15,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ListView;
 
 import com.google.gson.Gson;
 import com.kevin.zhihudaily.Constants;
@@ -142,4 +144,15 @@ public class NewsListFragment extends Fragment {
         });
     }
 
+    private class ListItemClickListener implements ListView.OnItemClickListener {
+
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            // TODO Auto-generated method stub
+            Intent intent = new Intent(getActivity(), NewsDetailActivity.class);
+            //            intent.putExtra(Constants.INTENT_NEWS_NUM, );
+            intent.putExtra(Constants.INTENT_NEWS_INDEX, position);
+            startActivity(intent);
+        }
+    }
 }
