@@ -4,4 +4,5 @@
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
 	<dimen name="news_detail_pager_margin">0dp</dimen>
+	<dimen name="news_detail_image_height">250dp</dimen>
 </resources>

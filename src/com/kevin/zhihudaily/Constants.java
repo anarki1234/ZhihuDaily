@@ -11,6 +11,7 @@ public class Constants {
 
     public static final String INTENT_NEWS_NUM = "news_num";
     public static final String INTENT_NEWS_INDEX = "news_index";
+    public static final String INTENT_NEWS_DATE = "news_date";
     public static final String INTENT_NEWS_ID = "news_id";
     public static final String INTENT_NEWS_TITLE = "news_title";
     public static final String INTENT_NEWS_URL = "news_url";

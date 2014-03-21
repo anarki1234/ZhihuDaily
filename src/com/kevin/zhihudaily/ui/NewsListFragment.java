@@ -1,8 +1,5 @@
 package com.kevin.zhihudaily.ui;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.http.Header;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -115,19 +112,20 @@ public class NewsListFragment extends Fragment {
                 Log.d(TAG, "==onSuccess==" + responseBody);
                 Gson gson = new Gson();
                 DailyNewsModel model = gson.fromJson(responseBody, DailyNewsModel.class);
-                List<DailyNewsModel> list = new ArrayList<DailyNewsModel>();
-                list.add(model);
 
-                mListAdpater.updateList(list);
+                mListAdpater.updateList(model);
 
-                mFlowAdapter.updateList(list.get(0).getTopStories());
+                mFlowAdapter.updateList(model.getTopStories());
 
-                int newTimeStamp = Integer.valueOf(list.get(0).getNewsList().get(0).getGa_prefix());
+                int newTimeStamp = Integer.valueOf(model.getNewsList().get(0).getGa_prefix());
+
+                // Add to cache and write to db
+                DataCache.getInstance().addDailyCache(model.getDate(), model);
+
                 if (DataBaseManager.getInstance().checkDataExpire(newTimeStamp)) {
-                    // add to cache and write to db
-                    DataCache.getInstance().addDailyCache(list.get(0).getDate(), list);
+                    // Write to db
                     Intent intent = new Intent(getActivity(), DataService.class);
-                    intent.putExtra(Constants.INTENT_CACHE_ID, list.hashCode());
+                    intent.putExtra(Constants.INTENT_CACHE_ID, model.getDate());
                     intent.putExtra(Constants.INTENT_ACTION_TYPE, Constants.ACTION_WRITE_DAILY_NEWS);
                     getActivity().startService(intent);
 
@@ -155,10 +153,8 @@ public class NewsListFragment extends Fragment {
             Intent intent = new Intent(getActivity(), NewsDetailActivity.class);
             intent.putExtra(Constants.INTENT_NEWS_NUM, item.getSectionSize());
             intent.putExtra(Constants.INTENT_NEWS_INDEX, item.getIndexOfDay());
+            intent.putExtra(Constants.INTENT_NEWS_DATE, item.getDate());
             Log.d(TAG, "==index=" + item.getIndexOfDay() + "==pos=" + position);
-
-            // add data to cache
-            DataCache.getInstance().setNewsCache(item.getModel());
 
             startActivity(intent);
         }

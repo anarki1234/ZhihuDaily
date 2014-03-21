@@ -18,7 +18,9 @@ import android.view.View.OnClickListener;
 import com.kevin.zhihudaily.BuildConfig;
 import com.kevin.zhihudaily.Constants;
 import com.kevin.zhihudaily.R;
+import com.kevin.zhihudaily.db.DataCache;
 import com.kevin.zhihudaily.imageutil.Utils;
+import com.kevin.zhihudaily.model.DailyNewsModel;
 import com.kevin.zhihudaily.model.NewsModel;
 
 public class NewsDetailActivity extends ActionBarActivity implements OnClickListener {
@@ -47,6 +49,7 @@ public class NewsDetailActivity extends ActionBarActivity implements OnClickList
         final int width = displayMetrics.widthPixels;
 
         Intent intent = getIntent();
+        String dateKey = intent.getStringExtra(Constants.INTENT_NEWS_DATE);
         if (intent != null) {
             mNewsNum = intent.getIntExtra(Constants.INTENT_NEWS_NUM, 1);
             mSelectModel.setId(intent.getIntExtra(Constants.INTENT_NEWS_ID, -1));
@@ -56,8 +59,11 @@ public class NewsDetailActivity extends ActionBarActivity implements OnClickList
             mSelectModel.setImage(intent.getStringExtra(Constants.INTENT_NEWS_IMAGE_URL));
         }
 
+        // Read from cache for viewpager data
+        DailyNewsModel dailyNewsModel = DataCache.getInstance().getDailyNewsModel(dateKey);
+
         // Set up ViewPager and backing adapter
-        mAdapter = new DetailPagerAdapter(getSupportFragmentManager(), mNewsNum);
+        mAdapter = new DetailPagerAdapter(getSupportFragmentManager(), mNewsNum, dailyNewsModel);
         mPager = (ViewPager) findViewById(R.id.pager);
         mPager.setAdapter(mAdapter);
         mPager.setPageMargin((int) getResources().getDimension(R.dimen.news_detail_pager_margin));
@@ -121,11 +127,13 @@ public class NewsDetailActivity extends ActionBarActivity implements OnClickList
     private class DetailPagerAdapter extends FragmentStatePagerAdapter {
 
         private final int mSize;
+        private final DailyNewsModel mDailyNewsModel;
 
-        public DetailPagerAdapter(FragmentManager fm, int size) {
+        public DetailPagerAdapter(FragmentManager fm, int size, DailyNewsModel model) {
             super(fm);
             // TODO Auto-generated constructor stub
             mSize = size;
+            mDailyNewsModel = model;
         }
 
         @Override
@@ -137,7 +145,7 @@ public class NewsDetailActivity extends ActionBarActivity implements OnClickList
         @Override
         public Fragment getItem(int position) {
             // TODO Auto-generated method stub
-            return NewsDetailFragment.newInstance();
+            return NewsDetailFragment.newInstance(mDailyNewsModel.getNewsList().get(position));
         }
     }
 

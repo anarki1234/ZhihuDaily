@@ -1,7 +1,5 @@
 package com.kevin.zhihudaily.db;
 
-import java.util.List;
-
 import android.app.IntentService;
 import android.content.Intent;
 import android.util.Log;
@@ -44,8 +42,8 @@ public class DataService extends IntentService {
                 break;
             }
 
-            List<DailyNewsModel> models = DataCache.getInstance().getDailyNewsModels(key);
-            DataBaseManager.getInstance().writeToDB(models);
+            DailyNewsModel model = DataCache.getInstance().getDailyNewsModel(key);
+            DataBaseManager.getInstance().writeToDB(model);
 
             break;
 

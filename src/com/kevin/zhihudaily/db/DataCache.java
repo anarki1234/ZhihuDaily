@@ -1,7 +1,5 @@
 package com.kevin.zhihudaily.db;
 
-import java.util.List;
-
 import android.annotation.SuppressLint;
 import android.util.SparseArray;
 
@@ -11,13 +9,13 @@ import com.kevin.zhihudaily.model.NewsModel;
 public class DataCache {
 
     private static DataCache mDataCache;
-    private SparseArray<List<DailyNewsModel>> mDailyMap;
-    private NewsModel mNewsCache;
+    private SparseArray<DailyNewsModel> mDailyMap;
+    private SparseArray<NewsModel> mNewsMap;
     private static final int CACHE_MAX_SIZE = 10;
 
     private DataCache() {
-        mDailyMap = new SparseArray<List<DailyNewsModel>>();
-        mNewsCache = new NewsModel();
+        mDailyMap = new SparseArray<DailyNewsModel>();
+        mNewsMap = new SparseArray<NewsModel>();
     }
 
     public static DataCache getInstance() {
@@ -32,11 +30,11 @@ public class DataCache {
     }
 
     @SuppressLint("NewApi")
-    public void addDailyCache(String key, List<DailyNewsModel> list) {
+    public void addDailyCache(String key, DailyNewsModel model) {
         if (mDailyMap.size() >= CACHE_MAX_SIZE) {
-            mDailyMap.removeAt(0);
+            mDailyMap.removeAtRange(0, CACHE_MAX_SIZE / 4);
         }
-        mDailyMap.put(key.hashCode(), list);
+        mDailyMap.put(key.hashCode(), model);
 
     }
 
@@ -48,19 +46,19 @@ public class DataCache {
         mDailyMap.clear();
     }
 
-    public List<DailyNewsModel> getDailyNewsModels(String key) {
+    public DailyNewsModel getDailyNewsModel(String key) {
         return mDailyMap.get(key.hashCode());
     }
 
-    public void setNewsCache(NewsModel model) {
-        this.mNewsCache = model;
+    public void addNewsCache(int id, NewsModel model) {
+        mNewsMap.put(id, model);
     }
 
-    public NewsModel getNewsCache() {
-        return this.mNewsCache;
+    public NewsModel getNewsCache(int id) {
+        return mNewsMap.get(id);
     }
 
     public void clearNewsCache() {
-        mNewsCache = null;
+        mNewsMap.clear();
     }
 }
