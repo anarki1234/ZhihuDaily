@@ -23,10 +23,17 @@ public class NewsDetailFragment extends Fragment {
         return detailFragment;
     }
 
+    /**
+     * Empty constructor as per the Fragment documentation
+     */
+    public NewsDetailFragment() {
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         // TODO Auto-generated method stub
         super.onCreate(savedInstanceState);
+        getArguments();
     }
 
     @Override

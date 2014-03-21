@@ -39,14 +39,14 @@ public class DataService extends IntentService {
         int action = intent.getIntExtra(Constants.INTENT_ACTION_TYPE, -1);
         switch (action) {
         case Constants.ACTION_WRITE_DAILY_NEWS:
-            int key = intent.getIntExtra(Constants.INTENT_CACHE_ID, -1);
-            if (key == -1) {
+            String key = intent.getStringExtra(Constants.INTENT_CACHE_ID);
+            if (key == null) {
                 break;
             }
 
             List<DailyNewsModel> models = DataCache.getInstance().getDailyNewsModels(key);
             DataBaseManager.getInstance().writeToDB(models);
-            DataCache.getInstance().deleteDailyCache(key);
+
             break;
 
         default:

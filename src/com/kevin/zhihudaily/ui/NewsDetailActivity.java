@@ -2,29 +2,31 @@ package com.kevin.zhihudaily.ui;
 
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
-import android.app.ActionBar;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.ActionBarActivity;
 import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.WindowManager.LayoutParams;
 
 import com.kevin.zhihudaily.BuildConfig;
 import com.kevin.zhihudaily.Constants;
 import com.kevin.zhihudaily.R;
 import com.kevin.zhihudaily.imageutil.Utils;
+import com.kevin.zhihudaily.model.NewsModel;
 
-public class NewsDetailActivity extends FragmentActivity implements OnClickListener {
+public class NewsDetailActivity extends ActionBarActivity implements OnClickListener {
 
     private DetailPagerAdapter mAdapter;
     private ViewPager mPager;
     private int mNewsNum = 1;
+    private NewsModel mSelectModel = new NewsModel();
 
     @SuppressLint("NewApi")
     @Override
@@ -35,7 +37,7 @@ public class NewsDetailActivity extends FragmentActivity implements OnClickListe
         }
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.news_detail_pager);
+        setContentView(R.layout.activity_news_detail);
 
         // Fetch screen height and width, to use as our max size when loading images as this
         // activity runs full screen
@@ -46,7 +48,12 @@ public class NewsDetailActivity extends FragmentActivity implements OnClickListe
 
         Intent intent = getIntent();
         if (intent != null) {
-            mNewsNum = getIntent().getIntExtra(Constants.INTENT_NEWS_NUM, 1);
+            mNewsNum = intent.getIntExtra(Constants.INTENT_NEWS_NUM, 1);
+            mSelectModel.setId(intent.getIntExtra(Constants.INTENT_NEWS_ID, -1));
+            mSelectModel.setTitle(intent.getStringExtra(Constants.INTENT_NEWS_TITLE));
+            mSelectModel.setUrl(intent.getStringExtra(Constants.INTENT_NEWS_URL));
+            mSelectModel.setImage_source(intent.getStringExtra(Constants.INTENT_NEWS_IMAGE_SOURCE));
+            mSelectModel.setImage(intent.getStringExtra(Constants.INTENT_NEWS_IMAGE_URL));
         }
 
         // Set up ViewPager and backing adapter
@@ -57,38 +64,39 @@ public class NewsDetailActivity extends FragmentActivity implements OnClickListe
         mPager.setOffscreenPageLimit(2);
 
         // Set up activity to go full screen
-        getWindow().addFlags(LayoutParams.FLAG_FULLSCREEN);
+        //        getWindow().addFlags(LayoutParams.FLAG_FULLSCREEN);
 
         // Enable some additional newer visibility and ActionBar features to create a more
         // immersive photo viewing experience
-        if (Utils.hasHoneycomb()) {
-            final ActionBar actionBar = getActionBar();
+        //        if (Utils.hasHoneycomb()) {
 
-            // Hide title text and set home as up
-            actionBar.setDisplayShowTitleEnabled(false);
-            actionBar.setDisplayHomeAsUpEnabled(true);
+        // Hide title text and set home as up
+        getActionBar().setDisplayShowTitleEnabled(false);
+        getActionBar().setDisplayHomeAsUpEnabled(true);
+        getActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#33000000")));
 
-            // Hide and show the ActionBar as the visibility changes
-            mPager.setOnSystemUiVisibilityChangeListener(new View.OnSystemUiVisibilityChangeListener() {
-                @Override
-                public void onSystemUiVisibilityChange(int vis) {
-                    if ((vis & View.SYSTEM_UI_FLAG_LOW_PROFILE) != 0) {
-                        actionBar.hide();
-                    } else {
-                        actionBar.show();
-                    }
+        // Hide and show the ActionBar as the visibility changes
+        mPager.setOnSystemUiVisibilityChangeListener(new View.OnSystemUiVisibilityChangeListener() {
+            @Override
+            public void onSystemUiVisibilityChange(int vis) {
+                if ((vis & View.SYSTEM_UI_FLAG_LOW_PROFILE) != 0) {
+                    getActionBar().hide();
+                } else {
+                    getActionBar().show();
                 }
-            });
+            }
+        });
+        mPager.setOnClickListener(this);
 
-            // Start low profile mode and hide ActionBar
-            mPager.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE);
-            actionBar.hide();
-        }
+        // Start low profile mode and hide ActionBar
+        mPager.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE);
+        getActionBar().hide();
+        //        }
 
         // Set the current item based on the extra passed in to this activity
         final int extraCurrentItem = getIntent().getIntExtra(Constants.INTENT_NEWS_INDEX, -1);
         if (extraCurrentItem != -1) {
-            mPager.setCurrentItem(extraCurrentItem);
+            mPager.setCurrentItem(extraCurrentItem - 1);
         }
     }
 
@@ -146,5 +154,9 @@ public class NewsDetailActivity extends FragmentActivity implements OnClickListe
         } else {
             mPager.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE);
         }
+    }
+
+    private void requestNewsDatail() {
+
     }
 }

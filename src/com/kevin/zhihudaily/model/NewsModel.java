@@ -42,5 +42,4 @@ public class NewsModel extends BaseNewsModel {
         this.css = json.optString("css");
         return super.parseJSON(json);
     }
-
 }

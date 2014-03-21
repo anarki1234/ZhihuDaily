@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,6 +21,7 @@ import com.squareup.picasso.Picasso;
 
 public class NewsListAdapter extends BaseAdapter implements PinnedSectionListAdapter {
 
+    private static final String TAG = "NewsListAdapter";
     private WeakReference<Context> mContextWR;
     private List<ListItem> mItemList = null;
 
@@ -35,12 +37,16 @@ public class NewsListAdapter extends BaseAdapter implements PinnedSectionListAda
 
         public final int type;
         public final String section;
-        public NewsModel model;
+        public final int sectionSize;
+        public final NewsModel model;
+        public final int indexOfDay;
 
-        public ListItem(int type, NewsModel model, String section) {
+        public ListItem(int type, NewsModel model, String section, int size, int index) {
             this.type = type;
             this.model = model;
             this.section = section;
+            this.sectionSize = size;
+            this.indexOfDay = index;
         }
 
         public NewsModel getModel() {
@@ -55,6 +61,14 @@ public class NewsListAdapter extends BaseAdapter implements PinnedSectionListAda
             return section;
         }
 
+        public int getSectionSize() {
+            return sectionSize;
+        }
+
+        public int getIndexOfDay() {
+            return indexOfDay;
+        }
+
     }
 
     public NewsListAdapter(Context context) {
@@ -67,13 +81,15 @@ public class NewsListAdapter extends BaseAdapter implements PinnedSectionListAda
             int size = list.size();
             for (int i = 0; i < size; i++) {
                 DailyNewsModel dailyModel = list.get(i);
-                ListItem section = new ListItem(ListItem.SECTION, null, dailyModel.getDisplay_date());
-                mItemList.add(section);
-
                 List<NewsModel> newsList = dailyModel.getNewsList();
                 int len = newsList.size();
+
+                ListItem section = new ListItem(ListItem.SECTION, null, dailyModel.getDisplay_date(), len, -1);
+                mItemList.add(section);
+
                 for (int j = 0; j < len; j++) {
-                    ListItem item = new ListItem(ListItem.ITEM, newsList.get(j), null);
+                    ListItem item = new ListItem(ListItem.ITEM, newsList.get(j), null, len, j);
+                    Log.e(TAG, "==item[" + j + "]" + "=title=" + newsList.get(j).getTitle());
                     mItemList.add(item);
                 }
 
@@ -91,13 +107,14 @@ public class NewsListAdapter extends BaseAdapter implements PinnedSectionListAda
             int size = list.size();
             for (int i = 0; i < size; i++) {
                 DailyNewsModel dailyModel = list.get(i);
-                ListItem section = new ListItem(ListItem.SECTION, null, dailyModel.getDisplay_date());
-                mItemList.add(section);
-
                 List<NewsModel> newsList = dailyModel.getNewsList();
                 int len = newsList.size();
+
+                ListItem section = new ListItem(ListItem.SECTION, null, dailyModel.getDisplay_date(), len, -1);
+                mItemList.add(section);
+
                 for (int j = 0; j < len; j++) {
-                    ListItem item = new ListItem(ListItem.ITEM, newsList.get(j), null);
+                    ListItem item = new ListItem(ListItem.ITEM, newsList.get(j), null, len, j);
                     mItemList.add(item);
                 }
 
