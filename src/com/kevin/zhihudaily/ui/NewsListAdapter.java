@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -93,7 +92,7 @@ public class NewsListAdapter extends BaseAdapter implements PinnedSectionListAda
 
             for (int j = 0; j < len; j++) {
                 ListItem item = new ListItem(ListItem.ITEM, newsList.get(j), null, len, j, date);
-                Log.e(TAG, "==item[" + j + "]" + "=title=" + newsList.get(j).getTitle());
+                //                Log.e(TAG, "==item[" + j + "]" + "=title=" + newsList.get(j).getTitle());
                 mItemList.add(item);
             }
         }

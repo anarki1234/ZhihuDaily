@@ -41,8 +41,10 @@ public class DataBaseManager {
     }
 
     public void closeDB() {
+        Log.e(TAG, "==closeDB==");
+        new Exception().printStackTrace();
         db.close();
-        mHelper = null;
+        //        mHelper = null;
     }
 
     private void initDataTimeStamp() {
@@ -77,11 +79,15 @@ public class DataBaseManager {
         editor.commit();
     }
 
-    public int writeToDB(DailyNewsModel dailyNewsModel) {
-        Log.e(TAG, "==writeToDB");
+    public int writeDailyNewsToDB(DailyNewsModel dailyNewsModel) {
+        Log.d(TAG, "==writeDailyNewsToDB");
         int count = 0;
         if (dailyNewsModel == null) {
             return 0;
+        }
+
+        if (!db.isOpen()) {
+            db = mHelper.getReadableDatabase();
         }
 
         db.beginTransaction();
@@ -116,8 +122,36 @@ public class DataBaseManager {
 
                 db.insertWithOnConflict(DataBaseConstants.NEWS_TABLE_NAME, null, values,
                         SQLiteDatabase.CONFLICT_REPLACE);
+
+                count++;
             }
             db.setTransactionSuccessful();
+        } catch (Exception e) {
+            // TODO: handle exception
+        } finally {
+            db.endTransaction();
+        }
+        return count;
+    }
+
+    public int writeNewsToDB(NewsModel model) {
+        Log.d(TAG, "==writeDailyNewsToDB");
+        int count = 0;
+        if (model == null) {
+            return 0;
+        }
+
+        if (!db.isOpen()) {
+            db = mHelper.getReadableDatabase();
+        }
+
+        db.beginTransaction();
+        try {
+            ContentValues values = new ContentValues();
+            values.put(DataBaseConstants.BODY, model.getBody());
+
+            db.updateWithOnConflict(DataBaseConstants.NEWS_TABLE_NAME, values,
+                    DataBaseConstants.ID + "=" + model.getId(), null, SQLiteDatabase.CONFLICT_REPLACE);
         } catch (Exception e) {
             // TODO: handle exception
         } finally {

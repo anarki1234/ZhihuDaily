@@ -6,6 +6,7 @@ import android.util.Log;
 
 import com.kevin.zhihudaily.Constants;
 import com.kevin.zhihudaily.model.DailyNewsModel;
+import com.kevin.zhihudaily.model.NewsModel;
 
 public class DataService extends IntentService {
 
@@ -43,10 +44,17 @@ public class DataService extends IntentService {
             }
 
             DailyNewsModel model = DataCache.getInstance().getDailyNewsModel(key);
-            DataBaseManager.getInstance().writeToDB(model);
+            DataBaseManager.getInstance().writeDailyNewsToDB(model);
 
             break;
+        case Constants.ACTION_WRITE_NEWS_DEATIL:
+            int id = intent.getIntExtra(Constants.INTENT_NEWS_ID, -1);
+            if (id == -1) {
+                break;
+            }
 
+            NewsModel newsModel = DataCache.getInstance().getNewsCache(id);
+            DataBaseManager.getInstance().writeNewsToDB(newsModel);
         default:
             break;
         }

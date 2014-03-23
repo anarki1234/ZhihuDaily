@@ -1,7 +1,6 @@
 package com.kevin.zhihudaily.ui;
 
 import org.apache.http.Header;
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.taptwo.android.widget.CircleFlowIndicator;
 
@@ -133,12 +132,6 @@ public class NewsListFragment extends Fragment {
                     DataBaseManager.getInstance().setDataTimeStamp(newTimeStamp);
                 }
 
-            }
-
-            @Override
-            protected Object parseResponse(String responseBody) throws JSONException {
-                // TODO Auto-generated method stub
-                return super.parseResponse(responseBody);
             }
 
         });

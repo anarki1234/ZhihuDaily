@@ -76,4 +76,8 @@ public class ZhihuRequest {
         return BASE_URL + relativeUrl;
 
     }
+
+    public static void getNewsDetail(String url, AsyncHttpResponseHandler responseHandler) {
+        mHttpClient.get(url, null, responseHandler);
+    }
 }

@@ -84,6 +84,7 @@ public class TopStoryAdapter extends BaseAdapter {
 
             convertView = LayoutInflater.from(mContextWR.get()).inflate(R.layout.fragment_top_story, null);
             holder.imageView = (ImageView) convertView.findViewById(R.id.iv_story_image);
+            holder.titleTextView = (TextView) convertView.findViewById(R.id.tv_news_title);
 
             convertView.setTag(holder);
         } else {
@@ -102,7 +103,9 @@ public class TopStoryAdapter extends BaseAdapter {
         }
 
         NewsModel model = mDataList.get(position);
-        Picasso.with(mContextWR.get()).load(model.getImage()).placeholder(R.drawable.ic_header).fit()
+        Picasso.with(mContextWR.get()).load(model.getImage()).placeholder(R.drawable.ic_header).fit().centerCrop()
                 .into(holder.imageView);
+
+        holder.titleTextView.setText(model.getTitle());
     }
 }

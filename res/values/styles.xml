@@ -21,7 +21,9 @@
 	<style name="Text" />
 	
     <style name="Text.ListItemDefault">
-        <item name="android:textSize">20sp</item>
+        <item name="android:textSize">18.0sp</item>
+        <item name="android:paddingLeft">8.0dp</item>
+        <item name="android:paddingRight">8.0dp</item>
         <item name="android:textColor">@android:color/black</item>
     </style>
     
