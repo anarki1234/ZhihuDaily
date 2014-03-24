@@ -14,6 +14,7 @@ import android.support.v7.app.ActionBarActivity;
 import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.Window;
 
 import com.kevin.zhihudaily.BuildConfig;
 import com.kevin.zhihudaily.Constants;
@@ -39,6 +40,7 @@ public class NewsDetailActivity extends ActionBarActivity implements OnClickList
         }
         super.onCreate(savedInstanceState);
 
+        requestWindowFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
         setContentView(R.layout.activity_news_detail);
 
         // Fetch screen height and width, to use as our max size when loading images as this
@@ -69,12 +71,12 @@ public class NewsDetailActivity extends ActionBarActivity implements OnClickList
         mPager.setPageMargin((int) getResources().getDimension(R.dimen.news_detail_pager_margin));
         mPager.setOffscreenPageLimit(2);
 
-        // Set up activity to go full screen
-        //        getWindow().addFlags(LayoutParams.FLAG_FULLSCREEN);
+        // Set animation
+        //        mPager.setPageTransformer(true, new ZoomOutPageTransformer());
+        mPager.setPageTransformer(true, new DepthPageTransformer());
 
         // Enable some additional newer visibility and ActionBar features to create a more
         // immersive photo viewing experience
-        //        if (Utils.hasHoneycomb()) {
 
         // Hide title text and set home as up
         getActionBar().setDisplayShowTitleEnabled(false);
@@ -92,12 +94,10 @@ public class NewsDetailActivity extends ActionBarActivity implements OnClickList
                 }
             }
         });
-        mPager.setOnClickListener(this);
 
         // Start low profile mode and hide ActionBar
         mPager.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE);
         getActionBar().hide();
-        //        }
 
         // Set the current item based on the extra passed in to this activity
         final int extraCurrentItem = getIntent().getIntExtra(Constants.INTENT_NEWS_INDEX, -1);
@@ -164,7 +164,4 @@ public class NewsDetailActivity extends ActionBarActivity implements OnClickList
         }
     }
 
-    private void requestNewsDatail() {
-
-    }
 }

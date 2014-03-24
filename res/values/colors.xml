@@ -15,7 +15,8 @@
    <color name="grey_light">#a8a8a8</color>
    <color name="grey_transparent">#f0dfdfdf</color>
    <color name="black_transprent">#10de4d35</color>
-   <color name="blue_main">#33b5e5</color>
    <color name="white">#ffffff</color>
    <color name="black">#000000</color>
+<!--    <color name="blue_main">#006cbb</color> -->
+   <color name="blue_main">#33b5e5</color>
 </resources>
