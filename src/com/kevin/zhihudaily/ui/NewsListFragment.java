@@ -158,7 +158,8 @@ public class NewsListFragment extends Fragment {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             // TODO Auto-generated method stub
-            ListItem item = (ListItem) mListAdpater.getItem(position);
+            //            ListItem item = (ListItem) mListAdpater.getItem(position);
+            ListItem item = (ListItem) parent.getItemAtPosition(position);
             Intent intent = new Intent(getActivity(), NewsDetailActivity.class);
             intent.putExtra(Constants.INTENT_NEWS_NUM, item.getSectionSize());
             intent.putExtra(Constants.INTENT_NEWS_INDEX, item.getIndexOfDay());

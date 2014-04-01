@@ -93,7 +93,7 @@ public class NewsDetailFragment extends Fragment {
         // TODO Auto-generated method stub
         super.onResume();
         // set up views
-        setupViews();
+        //        setupViews();
     }
 
     private void initViews() {
@@ -116,7 +116,8 @@ public class NewsDetailFragment extends Fragment {
         mWebView.getSettings().setDomStorageEnabled(true);
 
         //        // set up views
-        //        setupViews();
+        setupViews();
+
         mRootView.setOnClickListener((OnClickListener) getActivity());
     }
 

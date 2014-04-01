@@ -135,6 +135,11 @@ public class NewsListAdapter extends BaseAdapter implements PinnedSectionListAda
     public Object getItem(int position) {
         // TODO Auto-generated method stub
         return mItemList.get(position);
+        //        if (position < mItemList.size()) {
+        //            return mItemList.get(position);
+        //        } else {
+        //            return mItemList.get(position - 1);
+        //        }
     }
 
     @Override

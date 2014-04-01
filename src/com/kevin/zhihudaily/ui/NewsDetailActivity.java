@@ -12,6 +12,7 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
@@ -26,6 +27,7 @@ import com.kevin.zhihudaily.model.NewsModel;
 
 public class NewsDetailActivity extends ActionBarActivity implements OnClickListener {
 
+    private static final String TAG = "NewsDetailActivity";
     private DetailPagerAdapter mAdapter;
     private ViewPager mPager;
     private int mNewsNum = 1;
@@ -101,8 +103,9 @@ public class NewsDetailActivity extends ActionBarActivity implements OnClickList
 
         // Set the current item based on the extra passed in to this activity
         final int extraCurrentItem = getIntent().getIntExtra(Constants.INTENT_NEWS_INDEX, -1);
+        Log.e(TAG, "==pageindex==" + extraCurrentItem);
         if (extraCurrentItem != -1) {
-            mPager.setCurrentItem(extraCurrentItem - 1);
+            mPager.setCurrentItem(extraCurrentItem);
         }
     }
 
