@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.Fragment;
@@ -31,6 +33,7 @@ public class MainActivity extends ActionBarActivity {
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
     private ActionBarDrawerToggle mDrawerToggle;
+    private Drawable mActionBarDrawable;
 
     private CharSequence mDrawerTitle;
     private CharSequence mTitle;
@@ -59,7 +62,14 @@ public class MainActivity extends ActionBarActivity {
         getActionBar().setHomeButtonEnabled(true);
         getActionBar().setDisplayShowHomeEnabled(true);
         getActionBar().setDisplayShowTitleEnabled(false);
-        getActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#00000000")));
+
+        mActionBarDrawable = new ColorDrawable(Color.parseColor("#ff33b5e5"));
+        mActionBarDrawable.setAlpha(0);
+        //        getActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#00000000")));
+        getActionBar().setBackgroundDrawable(mActionBarDrawable);
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            mActionBarDrawable.setCallback(mDrawableCallback);
+        }
 
         // ActionBarDrawerToggle ties together the the proper interactions
         // between the sliding drawer and the action bar app icon
@@ -196,4 +206,23 @@ public class MainActivity extends ActionBarActivity {
         mDrawerToggle.onConfigurationChanged(newConfig);
     }
 
+    private Drawable.Callback mDrawableCallback = new Drawable.Callback() {
+        @SuppressLint("NewApi")
+        @Override
+        public void invalidateDrawable(Drawable who) {
+            getActionBar().setBackgroundDrawable(who);
+        }
+
+        @Override
+        public void scheduleDrawable(Drawable who, Runnable what, long when) {
+        }
+
+        @Override
+        public void unscheduleDrawable(Drawable who, Runnable what) {
+        }
+    };
+
+    public void setActionBarAlpha(int alpha) {
+        mActionBarDrawable.setAlpha(alpha);
+    }
 }

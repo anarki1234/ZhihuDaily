@@ -6,6 +6,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 import android.util.SparseBooleanArray;
@@ -160,7 +161,18 @@ public class DataBaseManager {
         return count;
     }
 
-    public List<DailyNewsModel> readDaliyNewsList(String date) {
+    public DailyNewsModel readDaliyNewsList(String date) {
+        DailyNewsModel dailyModel = new DailyNewsModel();
+        if (!db.isOpen()) {
+            db = mHelper.getReadableDatabase();
+        }
+
+        String[] columns = { "_id", "date" };
+        String selection = "date=?";
+        String[] selectionArgs = { date };
+        String groupBy = "";
+        Cursor result = db
+                .query(DataBaseConstants.NEWS_TABLE_NAME, columns, selection, selectionArgs, null, null, null);
         return null;
     }
 

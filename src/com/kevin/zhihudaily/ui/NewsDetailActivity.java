@@ -98,8 +98,8 @@ public class NewsDetailActivity extends ActionBarActivity implements OnClickList
         });
 
         // Start low profile mode and hide ActionBar
-        mPager.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE);
-        getActionBar().hide();
+        //        mPager.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE);
+        //        getActionBar().hide();
 
         // Set the current item based on the extra passed in to this activity
         final int extraCurrentItem = getIntent().getIntExtra(Constants.INTENT_NEWS_INDEX, -1);

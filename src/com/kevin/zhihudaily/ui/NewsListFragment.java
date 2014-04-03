@@ -6,7 +6,9 @@ import org.taptwo.android.widget.CircleFlowIndicator;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,6 +20,7 @@ import android.widget.ListView;
 
 import com.google.gson.Gson;
 import com.kevin.zhihudaily.Constants;
+import com.kevin.zhihudaily.MainActivity;
 import com.kevin.zhihudaily.R;
 import com.kevin.zhihudaily.db.DataBaseManager;
 import com.kevin.zhihudaily.db.DataCache;
@@ -27,12 +30,13 @@ import com.kevin.zhihudaily.model.DailyNewsModel;
 import com.kevin.zhihudaily.ui.NewsListAdapter.ListItem;
 import com.loopj.android.http.JsonHttpResponseHandler;
 
-public class NewsListFragment extends Fragment {
+public class NewsListFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
 
     protected static final String TAG = "NewsListFragment";
 
     private View mRootView;
 
+    private SwipeRefreshLayout mSwipeRefreshLayout;
     private MainListView mListView;
     private NewsListAdapter mListAdpater;
 
@@ -43,6 +47,8 @@ public class NewsListFragment extends Fragment {
     private CircleFlowIndicator mIndicator;
 
     private TopStoryAdapter mFlowAdapter;
+
+    private int mHeaderHeight;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -74,6 +80,11 @@ public class NewsListFragment extends Fragment {
             return;
         }
 
+        mSwipeRefreshLayout = (SwipeRefreshLayout) mRootView.findViewById(R.id.swipe_container);
+        mSwipeRefreshLayout.setOnRefreshListener(this);
+        mSwipeRefreshLayout.setColorScheme(android.R.color.holo_blue_bright, android.R.color.holo_green_light,
+                android.R.color.holo_orange_light, android.R.color.holo_red_light);
+
         mHeaderView = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_list_header, null);
 
         mFlowAdapter = new TopStoryAdapter(getActivity());
@@ -85,25 +96,12 @@ public class NewsListFragment extends Fragment {
 
         mListView = (MainListView) mRootView.findViewById(R.id.content_list);
         mListView.addHeaderView(mHeaderView);
+        mListView.setOnScrollListener(mOnScrollListener);
 
         mListAdpater = new NewsListAdapter(getActivity());
         mListView.setAdapter(mListAdpater);
         mViewFlow.setListView(mListView);
         mListView.setOnItemClickListener(new ListItemClickListener());
-        mListView.setOnScrollListener(new OnScrollListener() {
-
-            @Override
-            public void onScrollStateChanged(AbsListView view, int scrollState) {
-                // TODO Auto-generated method stub
-
-            }
-
-            @Override
-            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-                // TODO Auto-generated method stub
-
-            }
-        });
 
         // request latest news
 
@@ -169,4 +167,48 @@ public class NewsListFragment extends Fragment {
             startActivity(intent);
         }
     }
+
+    @Override
+    public void onRefresh() {
+        // TODO Auto-generated method stub
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mSwipeRefreshLayout.setRefreshing(false);
+            }
+        }, 3000);
+    }
+
+    private OnScrollListener mOnScrollListener = new OnScrollListener() {
+
+        @Override
+        public void onScrollStateChanged(AbsListView view, int scrollState) {
+            // TODO Auto-generated method stub
+
+        }
+
+        @Override
+        public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+            // TODO Auto-generated method stub
+            int visiblePostion = mListView.getFirstVisiblePosition();
+            int newAlpha;
+            if (visiblePostion == 0) {
+                View c = mListView.getChildAt(0);
+                int scrolly = -c.getTop() + mListView.getFirstVisiblePosition() * c.getHeight();
+                Log.e(TAG, "==onScrollStateChanged==  c.getTop()=" + c.getTop() + "   c.getHeight()=" + c.getHeight()
+                        + "  Pos=" + mListView.getFirstVisiblePosition());
+                mHeaderHeight = mHeaderView.getHeight();
+                final float ratio = (float) Math.min(Math.max(scrolly, 0), mHeaderHeight) / mHeaderHeight;
+                newAlpha = (int) (ratio * 255);
+                Log.e(TAG, "==onScrollStateChanged==  Y=" + scrolly + "   mHeaderHeight=" + mHeaderHeight + "  Alpha="
+                        + newAlpha);
+                ((MainActivity) getActivity()).setActionBarAlpha(newAlpha);
+
+            } else {
+                newAlpha = 255;
+            }
+            ((MainActivity) getActivity()).setActionBarAlpha(newAlpha);
+        }
+
+    };
 }
