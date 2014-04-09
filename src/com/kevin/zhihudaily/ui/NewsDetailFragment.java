@@ -5,7 +5,9 @@ import org.json.JSONObject;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,9 +26,10 @@ import com.kevin.zhihudaily.model.NewsModel;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.squareup.picasso.Picasso;
 
-public class NewsDetailFragment extends Fragment {
+public class NewsDetailFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
     private static final String TAG = "NewsDetailFragment";
     private View mRootView;
+    private SwipeRefreshLayout mSwipeRefreshLayout;
     private ImageView mImageView;
     private TextView mTitleTextView;
     private TextView mSourceTextView;
@@ -101,6 +104,11 @@ public class NewsDetailFragment extends Fragment {
             return;
         }
 
+        mSwipeRefreshLayout = (SwipeRefreshLayout) mRootView.findViewById(R.id.swipe_container);
+        mSwipeRefreshLayout.setOnRefreshListener(this);
+        mSwipeRefreshLayout.setColorScheme(android.R.color.holo_blue_bright, android.R.color.holo_green_light,
+                android.R.color.holo_orange_light, android.R.color.holo_red_light);
+
         mImageView = (ImageView) mRootView.findViewById(R.id.iv_image);
         mTitleTextView = (TextView) mRootView.findViewById(R.id.tv_news_title);
         mSourceTextView = (TextView) mRootView.findViewById(R.id.tv_news_image_source);
@@ -163,12 +171,14 @@ public class NewsDetailFragment extends Fragment {
             public void onFailure(Throwable e, JSONObject errorResponse) {
                 // TODO Auto-generated method stub
                 super.onFailure(e, errorResponse);
+                Log.d(TAG, "==onFailure==" + errorResponse);
             }
 
             @Override
             public void onSuccess(int statusCode, Header[] headers, String responseBody) {
                 // TODO Auto-generated method stub
                 super.onSuccess(statusCode, headers, responseBody);
+                Log.d(TAG, "==onSuccess==" + responseBody);
                 Gson gson = new Gson();
                 NewsModel model = gson.fromJson(responseBody, NewsModel.class);
 
@@ -208,6 +218,17 @@ public class NewsDetailFragment extends Fragment {
             mWebView.loadDataWithBaseURL("file:///android_asset/", htmldata, "text/html", "UTF-8", null);
         }
 
+    }
+
+    @Override
+    public void onRefresh() {
+        // TODO Auto-generated method stub
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mSwipeRefreshLayout.setRefreshing(false);
+            }
+        }, 3000);
     }
 
 }

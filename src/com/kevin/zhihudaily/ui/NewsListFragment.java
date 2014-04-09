@@ -195,13 +195,13 @@ public class NewsListFragment extends Fragment implements SwipeRefreshLayout.OnR
             if (visiblePostion == 0) {
                 View c = mListView.getChildAt(0);
                 int scrolly = -c.getTop() + mListView.getFirstVisiblePosition() * c.getHeight();
-                Log.e(TAG, "==onScrollStateChanged==  c.getTop()=" + c.getTop() + "   c.getHeight()=" + c.getHeight()
-                        + "  Pos=" + mListView.getFirstVisiblePosition());
+                //                Log.e(TAG, "==onScrollStateChanged==  c.getTop()=" + c.getTop() + "   c.getHeight()=" + c.getHeight()
+                //                        + "  Pos=" + mListView.getFirstVisiblePosition());
                 mHeaderHeight = mHeaderView.getHeight();
                 final float ratio = (float) Math.min(Math.max(scrolly, 0), mHeaderHeight) / mHeaderHeight;
                 newAlpha = (int) (ratio * 255);
-                Log.e(TAG, "==onScrollStateChanged==  Y=" + scrolly + "   mHeaderHeight=" + mHeaderHeight + "  Alpha="
-                        + newAlpha);
+                //                Log.e(TAG, "==onScrollStateChanged==  Y=" + scrolly + "   mHeaderHeight=" + mHeaderHeight + "  Alpha="
+                //                        + newAlpha);
                 ((MainActivity) getActivity()).setActionBarAlpha(newAlpha);
 
             } else {
