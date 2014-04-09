@@ -5,6 +5,8 @@ import org.json.JSONObject;
 public class NewsModel extends BaseNewsModel {
     String body = null;
 
+    int is_top_story = 0;
+
     //    String js = null;
 
     //    String css = null;
@@ -33,6 +35,14 @@ public class NewsModel extends BaseNewsModel {
     //        this.css = css;
     //    }
 
+    public int isIs_top_story() {
+        return is_top_story;
+    }
+
+    public void setIs_top_story(int is_top_story) {
+        this.is_top_story = is_top_story;
+    }
+
     @Override
     public boolean parseJSON(JSONObject json) {
         // TODO Auto-generated method stub
@@ -44,4 +54,5 @@ public class NewsModel extends BaseNewsModel {
         //        this.css = json.optString("css");
         return super.parseJSON(json);
     }
+
 }

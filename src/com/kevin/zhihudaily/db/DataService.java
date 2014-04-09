@@ -55,6 +55,15 @@ public class DataService extends IntentService {
 
             NewsModel newsModel = DataCache.getInstance().getNewsCache(id);
             DataBaseManager.getInstance().writeNewsToDB(newsModel);
+            break;
+        case Constants.ACTION_READ_DAILY_NEWS:
+            String date = intent.getStringExtra(Constants.INTENT_NEWS_DATE);
+            if (date == null) {
+                break;
+            }
+            DailyNewsModel dailyNewsModel = DataBaseManager.getInstance().readDaliyNewsList(date);
+            DataCache.getInstance().addDailyCache(dailyNewsModel.getDate(), dailyNewsModel);
+            break;
         default:
             break;
         }

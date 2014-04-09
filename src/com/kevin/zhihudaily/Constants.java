@@ -20,4 +20,11 @@ public class Constants {
     public static final String INTENT_NEWS_IMAGE_URL = "news_image_url";
     public static final String INTENT_NEWS_BODY = "news_body";
 
+    // Defines a custom Intent action
+    public static final String ACTION_BROADCAST = "com.kevin.zhihudaily.BROADCAST";
+
+    // Defines the key for the status "extra" in an Intent
+    public static final String EXTRA_NETWORK_ISCONNECTED = "com.kevin.zhihudaily.NETWORK_ISCONNECTED";
+    public static final String EXTRA_NETWORK_TYPE = "com.kevin.zhihudaily.NETWORK_TYPE";
+
 }

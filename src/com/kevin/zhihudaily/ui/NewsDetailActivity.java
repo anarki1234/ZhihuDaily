@@ -75,7 +75,7 @@ public class NewsDetailActivity extends ActionBarActivity implements OnClickList
 
         // Set animation
         //        mPager.setPageTransformer(true, new ZoomOutPageTransformer());
-        mPager.setPageTransformer(true, new DepthPageTransformer());
+        //        mPager.setPageTransformer(true, new DepthPageTransformer());
 
         // Enable some additional newer visibility and ActionBar features to create a more
         // immersive photo viewing experience

@@ -1,10 +1,16 @@
 package com.kevin.zhihudaily.ui;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Locale;
+
 import org.apache.http.Header;
 import org.json.JSONObject;
 import org.taptwo.android.widget.CircleFlowIndicator;
 
+import android.annotation.TargetApi;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
@@ -20,8 +26,8 @@ import android.widget.ListView;
 
 import com.google.gson.Gson;
 import com.kevin.zhihudaily.Constants;
-import com.kevin.zhihudaily.MainActivity;
 import com.kevin.zhihudaily.R;
+import com.kevin.zhihudaily.ZhihuDailyApplication;
 import com.kevin.zhihudaily.db.DataBaseManager;
 import com.kevin.zhihudaily.db.DataCache;
 import com.kevin.zhihudaily.db.DataService;
@@ -75,6 +81,7 @@ public class NewsListFragment extends Fragment implements SwipeRefreshLayout.OnR
         initViews();
     }
 
+    @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
     private void initViews() {
         if (mRootView == null) {
             return;
@@ -104,8 +111,15 @@ public class NewsListFragment extends Fragment implements SwipeRefreshLayout.OnR
         mListView.setOnItemClickListener(new ListItemClickListener());
 
         // request latest news
+        updateNewsList();
+    }
 
-        requestLatestNews();
+    private void updateNewsList() {
+        if (ZhihuDailyApplication.sIsConnected) {
+            requestLatestNews();
+        } else {
+            readLastestNewsFromDB();
+        }
     }
 
     private void requestLatestNews() {
@@ -149,6 +163,17 @@ public class NewsListFragment extends Fragment implements SwipeRefreshLayout.OnR
             }
 
         });
+    }
+
+    private void readLastestNewsFromDB() {
+        Calendar calendar = Calendar.getInstance();
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd", Locale.CHINA);
+        String curdate = formatter.format(calendar.getTime());
+        // Read db data
+        Intent intent = new Intent(getActivity(), DataService.class);
+        intent.putExtra(Constants.INTENT_ACTION_TYPE, Constants.ACTION_READ_DAILY_NEWS);
+        intent.putExtra(Constants.INTENT_NEWS_DATE, curdate);
+        getActivity().startService(intent);
     }
 
     private class ListItemClickListener implements ListView.OnItemClickListener {

@@ -1,5 +1,6 @@
 package com.kevin.zhihudaily.db;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import android.content.ContentValues;
@@ -115,6 +116,7 @@ public class DataBaseManager {
                 values.put(DataBaseConstants.GA_PREFIX, model.getGa_prefix());
                 values.put(DataBaseConstants.TITLE, model.getTitle());
                 values.put(DataBaseConstants.URL, model.getUrl());
+                Log.e(TAG, "==Image_source" + model.getImage_source());
                 values.put(DataBaseConstants.IMAGE_SOURCE, model.getImage_source());
                 values.put(DataBaseConstants.IMAGE_URL, model.getImage());
                 values.put(DataBaseConstants.IMAGE_THUMBNAIL, model.getThumbnail());
@@ -162,18 +164,40 @@ public class DataBaseManager {
     }
 
     public DailyNewsModel readDaliyNewsList(String date) {
-        DailyNewsModel dailyModel = new DailyNewsModel();
+        DailyNewsModel dailyModel = null;
         if (!db.isOpen()) {
             db = mHelper.getReadableDatabase();
         }
 
-        String[] columns = { "_id", "date" };
+        String[] columns = { DataBaseConstants.ID, DataBaseConstants.DATE, DataBaseConstants.IS_TOP_STORY,
+                DataBaseConstants.TITLE, DataBaseConstants.URL, DataBaseConstants.IMAGE_SOURCE,
+                DataBaseConstants.IMAGE_URL, DataBaseConstants.IMAGE_THUMBNAIL, DataBaseConstants.SHARE_URL };
         String selection = "date=?";
         String[] selectionArgs = { date };
-        String groupBy = "";
-        Cursor result = db
+        Cursor cursor = db
                 .query(DataBaseConstants.NEWS_TABLE_NAME, columns, selection, selectionArgs, null, null, null);
-        return null;
+        if (cursor != null) {
+            dailyModel = new DailyNewsModel();
+            ArrayList<NewsModel> newsList = new ArrayList<NewsModel>();
+            while (cursor.moveToNext()) {
+                NewsModel model = new NewsModel();
+                model.setId(cursor.getInt(cursor.getColumnIndexOrThrow(DataBaseConstants.ID)));
+                model.setDate(cursor.getString(cursor.getColumnIndexOrThrow(DataBaseConstants.DATE)));
+                //                model.setGa_prefix(cursor.getString(cursor.getColumnIndexOrThrow(DataBaseConstants.GA_PREFIX)));
+                model.setIs_top_story(cursor.getInt(cursor.getColumnIndexOrThrow(DataBaseConstants.IS_TOP_STORY)));
+                model.setTitle(cursor.getString(cursor.getColumnIndexOrThrow(DataBaseConstants.TITLE)));
+                model.setUrl(cursor.getString(cursor.getColumnIndexOrThrow(DataBaseConstants.URL)));
+                model.setImage_source(cursor.getString(cursor.getColumnIndexOrThrow(DataBaseConstants.IMAGE_SOURCE)));
+                model.setImage(cursor.getString(cursor.getColumnIndexOrThrow(DataBaseConstants.IMAGE_URL)));
+                model.setThumbnail(cursor.getString(cursor.getColumnIndexOrThrow(DataBaseConstants.IMAGE_THUMBNAIL)));
+                model.setShare_url(cursor.getString(cursor.getColumnIndexOrThrow(DataBaseConstants.SHARE_URL)));
+                newsList.add(model);
+            }
+            dailyModel.setNewsList(newsList);
+            dailyModel.setDate(newsList.get(0).getDate());
+            cursor.close();
+        }
+        return dailyModel;
     }
 
     public List<NewsModel> readNewsDetail(String date) {

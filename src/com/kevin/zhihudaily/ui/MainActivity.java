@@ -1,12 +1,15 @@
-package com.kevin.zhihudaily;
+package com.kevin.zhihudaily.ui;
 
 import android.annotation.SuppressLint;
 import android.app.SearchManager;
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
@@ -25,9 +28,10 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.kevin.zhihudaily.R;
+import com.kevin.zhihudaily.ZhihuDailyApplication;
 import com.kevin.zhihudaily.db.DataBaseManager;
 import com.kevin.zhihudaily.db.DataCache;
-import com.kevin.zhihudaily.ui.NewsListFragment;
 
 public class MainActivity extends ActionBarActivity {
     private DrawerLayout mDrawerLayout;
@@ -75,7 +79,7 @@ public class MainActivity extends ActionBarActivity {
         // between the sliding drawer and the action bar app icon
         mDrawerToggle = new ActionBarDrawerToggle(this, /* host Activity */
         mDrawerLayout, /* DrawerLayout object */
-        R.drawable.ic_drawer, /* nav drawer image to replace 'Up' caret */
+        R.drawable.ic_navigation_drawer, /* nav drawer image to replace 'Up' caret */
         R.string.drawer_open, /* "open drawer" description for accessibility */
         R.string.drawer_close /* "close drawer" description for accessibility */
         ) {
@@ -96,6 +100,22 @@ public class MainActivity extends ActionBarActivity {
         if (savedInstanceState == null) {
             // TODO set
             selectItem(0);
+        }
+
+        // check network info
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = null;
+        try {
+            networkInfo = connectivityManager.getActiveNetworkInfo();
+        } catch (Exception e) {
+            // TODO: handle exception
+        }
+        if (networkInfo != null) {
+            if (networkInfo.isConnected()) {
+                ZhihuDailyApplication.sIsConnected = true;
+            } else {
+                ZhihuDailyApplication.sIsConnected = false;
+            }
         }
 
         // init database

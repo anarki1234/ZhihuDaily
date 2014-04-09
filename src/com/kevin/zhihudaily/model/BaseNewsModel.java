@@ -11,6 +11,7 @@ public class BaseNewsModel {
     int id = 0;
     String ga_prefix = null;
     String thumbnail = null;
+    String date = null;
 
     public String getImage_source() {
         return image_source;
@@ -74,6 +75,14 @@ public class BaseNewsModel {
 
     public void setThumbnail(String thumbnail) {
         this.thumbnail = thumbnail;
+    }
+
+    public String getDate() {
+        return date;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
     }
 
     public boolean parseJSON(JSONObject json) {
