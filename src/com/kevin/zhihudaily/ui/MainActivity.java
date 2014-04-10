@@ -30,8 +30,6 @@ import android.widget.Toast;
 
 import com.kevin.zhihudaily.R;
 import com.kevin.zhihudaily.ZhihuDailyApplication;
-import com.kevin.zhihudaily.db.DataBaseManager;
-import com.kevin.zhihudaily.db.DataCache;
 
 public class MainActivity extends ActionBarActivity {
     private DrawerLayout mDrawerLayout;
@@ -118,15 +116,15 @@ public class MainActivity extends ActionBarActivity {
             }
         }
 
-        // init database
-        DataBaseManager.newInstance(getApplicationContext());
+        //        // init database
+        //        DataBaseManager.newInstance(getApplicationContext());
     }
 
     @Override
     protected void onDestroy() {
         // TODO Auto-generated method stub
-        DataBaseManager.getInstance().closeDB();
-        DataCache.getInstance().clearAllCache();
+        //        DataBaseManager.getInstance().closeDB();
+        //        DataCache.getInstance().clearAllCache();
         super.onDestroy();
     }
 

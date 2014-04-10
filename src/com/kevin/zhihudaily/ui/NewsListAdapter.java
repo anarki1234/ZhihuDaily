@@ -91,6 +91,7 @@ public class NewsListAdapter extends BaseAdapter implements PinnedSectionListAda
             mItemList.add(section);
 
             for (int j = 0; j < len; j++) {
+                newsList.get(j).setDate(date);
                 ListItem item = new ListItem(ListItem.ITEM, newsList.get(j), null, len, j, date);
                 //                Log.e(TAG, "==item[" + j + "]" + "=title=" + newsList.get(j).getTitle());
                 mItemList.add(item);

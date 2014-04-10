@@ -3,6 +3,8 @@ package com.kevin.zhihudaily.ui;
 import org.apache.http.Header;
 import org.json.JSONObject;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -19,6 +21,7 @@ import android.widget.TextView;
 import com.google.gson.Gson;
 import com.kevin.zhihudaily.Constants;
 import com.kevin.zhihudaily.R;
+import com.kevin.zhihudaily.ZhihuDailyApplication;
 import com.kevin.zhihudaily.db.DataCache;
 import com.kevin.zhihudaily.db.DataService;
 import com.kevin.zhihudaily.http.ZhihuRequest;
@@ -44,7 +47,8 @@ public class NewsDetailFragment extends Fragment implements SwipeRefreshLayout.O
         final Bundle args = new Bundle();
         // add data to cache
         int id = model.getId();
-        DataCache.getInstance().addNewsCache(id, model);
+        //        DataCache.getInstance().addNewsCache(id, model);
+        args.putString(Constants.INTENT_NEWS_DATE, model.getDate());
         args.putInt(Constants.INTENT_CACHE_ID, id);
         detailFragment.setArguments(args);
 
@@ -62,7 +66,8 @@ public class NewsDetailFragment extends Fragment implements SwipeRefreshLayout.O
         // TODO Auto-generated method stub
         super.onCreate(savedInstanceState);
         Bundle arg = getArguments();
-        mNewsModel = DataCache.getInstance().getNewsCache(arg.getInt(Constants.INTENT_CACHE_ID));
+        mNewsModel = DataCache.getInstance().getNewsModelByDateAndID(arg.getString(Constants.INTENT_NEWS_DATE),
+                arg.getInt(Constants.INTENT_CACHE_ID));
     }
 
     @Override
@@ -122,8 +127,9 @@ public class NewsDetailFragment extends Fragment implements SwipeRefreshLayout.O
         mWebView.getSettings().setJavaScriptEnabled(true);
         mWebView.getSettings().setCacheMode(1);
         mWebView.getSettings().setDomStorageEnabled(true);
+        mWebView.getSettings().setDatabaseEnabled(true);
 
-        //        // set up views
+        // set up views
         setupViews();
 
         mRootView.setOnClickListener((OnClickListener) getActivity());
@@ -136,7 +142,7 @@ public class NewsDetailFragment extends Fragment implements SwipeRefreshLayout.O
         mTitleTextView.setText(mNewsModel.getTitle());
         mSourceTextView.setText(mNewsModel.getImage_source());
 
-        requestNewsDetail();
+        updateNewsDetail();
 
         //        String htmlData = optimizeHtml(html);
         //        // lets assume we have /assets/style.css file
@@ -162,6 +168,19 @@ public class NewsDetailFragment extends Fragment implements SwipeRefreshLayout.O
         return html;
     }
 
+    private void updateNewsDetail() {
+        String body = mNewsModel.getBody();
+        if (body != null) {
+            updateWebView(body);
+        } else {
+            if (ZhihuDailyApplication.sIsConnected) {
+                requestNewsDetail();
+            } else {
+                readNewsDetailFromDB();
+            }
+        }
+    }
+
     private void requestNewsDetail() {
         String url = mNewsModel.getUrl();
         Log.d(TAG, "==URL==" + url);
@@ -184,13 +203,13 @@ public class NewsDetailFragment extends Fragment implements SwipeRefreshLayout.O
 
                 mNewsModel.setBody(model.getBody());
 
-                String htmldata = optimizeHtml(mNewsModel.getBody());
-                mWebView.loadDataWithBaseURL("file:///android_asset/", htmldata, "text/html", "UTF-8", null);
+                updateWebView(model.getBody());
                 //                AsyncRunnable runnable = new AsyncRunnable(model);
                 //                getActivity().runOnUiThread(runnable);
 
                 // Add to cache
-                DataCache.getInstance().addNewsCache(model.getId(), model);
+                mNewsModel.setBody(model.getBody());
+                //                DataCache.getInstance().updateNewsBodyByID(model.getDate(), model.getId(), model.getBody());
 
                 // Write to db
                 Intent intent = new Intent(getActivity(), DataService.class);
@@ -202,6 +221,20 @@ public class NewsDetailFragment extends Fragment implements SwipeRefreshLayout.O
 
         });
 
+    }
+
+    private void readNewsDetailFromDB() {
+        // Read db data
+        Intent intent = new Intent(getActivity(), DataService.class);
+        intent.putExtra(Constants.INTENT_ACTION_TYPE, Constants.ACTION_READ_NEWS_DEATIL);
+        intent.putExtra(Constants.INTENT_NEWS_DATE, mNewsModel.getDate());
+        intent.putExtra(Constants.INTENT_NEWS_ID, mNewsModel.getId());
+        getActivity().startService(intent);
+    }
+
+    private void updateWebView(String body) {
+        String htmldata = optimizeHtml(body);
+        mWebView.loadDataWithBaseURL("file:///android_asset/", htmldata, "text/html", "UTF-8", null);
     }
 
     private class AsyncRunnable implements Runnable {
@@ -231,4 +264,23 @@ public class NewsDetailFragment extends Fragment implements SwipeRefreshLayout.O
         }, 3000);
     }
 
+    private class NewsDetailReadyReceiver extends BroadcastReceiver {
+
+        private NewsDetailReadyReceiver() {
+
+        }
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            // TODO Auto-generated method stub
+            String date = intent.getStringExtra(Constants.INTENT_NEWS_DATE);
+            int id = intent.getIntExtra(Constants.INTENT_CACHE_ID, -1);
+            String body = DataCache.getInstance().getNewsBodyByDateAndID(date, id);
+            mNewsModel.setBody(body);
+
+            // Update ui
+            updateWebView(body);
+        }
+
+    }
 }

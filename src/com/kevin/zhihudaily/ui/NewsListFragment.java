@@ -2,6 +2,7 @@ package com.kevin.zhihudaily.ui;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Locale;
 
 import org.apache.http.Header;
@@ -37,268 +38,300 @@ import com.kevin.zhihudaily.db.DataCache;
 import com.kevin.zhihudaily.db.DataService;
 import com.kevin.zhihudaily.http.ZhihuRequest;
 import com.kevin.zhihudaily.model.DailyNewsModel;
+import com.kevin.zhihudaily.model.NewsModel;
 import com.kevin.zhihudaily.ui.NewsListAdapter.ListItem;
 import com.loopj.android.http.JsonHttpResponseHandler;
 
-public class NewsListFragment extends Fragment implements
-		SwipeRefreshLayout.OnRefreshListener {
+public class NewsListFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
 
-	protected static final String TAG = "NewsListFragment";
+    protected static final String TAG = "NewsListFragment";
 
-	private View mRootView;
+    private View mRootView;
 
-	private SwipeRefreshLayout mSwipeRefreshLayout;
-	private MainListView mListView;
-	private NewsListAdapter mListAdpater;
+    private SwipeRefreshLayout mSwipeRefreshLayout;
+    private MainListView mListView;
+    private NewsListAdapter mListAdpater;
 
-	private View mHeaderView;
+    private View mHeaderView;
 
-	private HeaderViewFlow mViewFlow;
+    private HeaderViewFlow mViewFlow;
 
-	private CircleFlowIndicator mIndicator;
+    private CircleFlowIndicator mIndicator;
 
-	private TopStoryAdapter mFlowAdapter;
+    private TopStoryAdapter mFlowAdapter;
 
-	private int mHeaderHeight;
+    private int mHeaderHeight;
 
-	private DataReadyReceiver mDataReadyReceiver;
+    private DataReadyReceiver mDataReadyReceiver;
 
-	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-			Bundle savedInstanceState) {
-		// TODO Auto-generated method stub
-		mRootView = inflater.inflate(R.layout.fragment_news_list, container,
-				false);
-		return mRootView;
-		// return super.onCreateView(inflater, container, savedInstanceState);
-	}
+    private Date mTodayDate;
+    private String mTodayDateString;
 
-	@Override
-	public void onDestroyView() {
-		// TODO Auto-generated method stub
-		super.onDestroyView();
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        // TODO Auto-generated method stub
+        mRootView = inflater.inflate(R.layout.fragment_news_list, container, false);
+        return mRootView;
+        // return super.onCreateView(inflater, container, savedInstanceState);
+    }
 
-		mRootView = null;
+    @Override
+    public void onDestroyView() {
+        // TODO Auto-generated method stub
+        super.onDestroyView();
 
-		LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(
-				mDataReadyReceiver);
-	}
+        mRootView = null;
 
-	@Override
-	public void onViewCreated(View view, Bundle savedInstanceState) {
-		// TODO Auto-generated method stub
-		super.onViewCreated(view, savedInstanceState);
+        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mDataReadyReceiver);
+    }
 
-		// set up views()
-		initViews();
-	}
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        // TODO Auto-generated method stub
+        super.onViewCreated(view, savedInstanceState);
 
-	@TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
-	private void initViews() {
-		if (mRootView == null) {
-			return;
-		}
+        // set up views()
+        initViews();
+    }
 
-		mDataReadyReceiver = new DataReadyReceiver();
-		IntentFilter dataIntentFilter = new IntentFilter(
-				Constants.ACTION_NOTIFY_UI);
-		LocalBroadcastManager.getInstance(getActivity()).registerReceiver(
-				mDataReadyReceiver, dataIntentFilter);
+    @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
+    private void initViews() {
+        if (mRootView == null) {
+            return;
+        }
 
-		mSwipeRefreshLayout = (SwipeRefreshLayout) mRootView
-				.findViewById(R.id.swipe_container);
-		mSwipeRefreshLayout.setOnRefreshListener(this);
-		mSwipeRefreshLayout.setColorScheme(android.R.color.holo_blue_bright,
-				android.R.color.holo_green_light,
-				android.R.color.holo_orange_light,
-				android.R.color.holo_red_light);
+        Calendar calendar = Calendar.getInstance();
+        mTodayDate = calendar.getTime();
 
-		mHeaderView = LayoutInflater.from(getActivity()).inflate(
-				R.layout.fragment_list_header, null);
+        mDataReadyReceiver = new DataReadyReceiver();
+        IntentFilter dataIntentFilter = new IntentFilter(Constants.ACTION_NOTIFY_UI);
+        dataIntentFilter.addCategory(Intent.CATEGORY_DEFAULT);
+        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mDataReadyReceiver, dataIntentFilter);
 
-		mFlowAdapter = new TopStoryAdapter(getActivity());
-		mViewFlow = (HeaderViewFlow) mHeaderView.findViewById(R.id.viewflow);
-		mViewFlow.setAdapter(mFlowAdapter);
+        mSwipeRefreshLayout = (SwipeRefreshLayout) mRootView.findViewById(R.id.swipe_container);
+        mSwipeRefreshLayout.setOnRefreshListener(this);
+        mSwipeRefreshLayout.setColorScheme(android.R.color.holo_blue_bright, android.R.color.holo_green_light,
+                android.R.color.holo_orange_light, android.R.color.holo_red_light);
 
-		mIndicator = (CircleFlowIndicator) mHeaderView
-				.findViewById(R.id.viewflowindic);
-		mViewFlow.setFlowIndicator(mIndicator);
+        mHeaderView = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_list_header, null);
 
-		mListView = (MainListView) mRootView.findViewById(R.id.content_list);
-		mListView.addHeaderView(mHeaderView);
-		mListView.setOnScrollListener(mOnScrollListener);
+        mFlowAdapter = new TopStoryAdapter(getActivity());
+        mViewFlow = (HeaderViewFlow) mHeaderView.findViewById(R.id.viewflow);
+        mViewFlow.setAdapter(mFlowAdapter);
 
-		mListAdpater = new NewsListAdapter(getActivity());
-		mListView.setAdapter(mListAdpater);
-		mViewFlow.setListView(mListView);
-		mListView.setOnItemClickListener(new ListItemClickListener());
+        mIndicator = (CircleFlowIndicator) mHeaderView.findViewById(R.id.viewflowindic);
+        mViewFlow.setFlowIndicator(mIndicator);
 
-		// request latest news
-		updateNewsList();
-	}
+        mListView = (MainListView) mRootView.findViewById(R.id.content_list);
+        mListView.addHeaderView(mHeaderView);
+        mListView.setOnScrollListener(mOnScrollListener);
 
-	private void updateNewsList() {
-		if (ZhihuDailyApplication.sIsConnected) {
-			requestLatestNews();
-		} else {
-			readLastestNewsFromDB();
-		}
-	}
+        mListAdpater = new NewsListAdapter(getActivity());
+        mListView.setAdapter(mListAdpater);
+        mViewFlow.setListView(mListView);
+        mListView.setOnItemClickListener(new ListItemClickListener());
 
-	private void requestLatestNews() {
-		ZhihuRequest.get(ZhihuRequest.GET_LATEST_NEWS, null,
-				new JsonHttpResponseHandler() {
+        // request latest news
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd", Locale.CHINA);
+        String todayDate = formatter.format(mTodayDate);
+        mTodayDateString = todayDate;
+        updateNewsList(todayDate);
+    }
 
-					@Override
-					public void onFailure(int statusCode, Throwable e,
-							JSONObject errorResponse) {
-						// TODO Auto-generated method stub
-						super.onFailure(statusCode, e, errorResponse);
-						Log.e(TAG, "==onFailure==" + errorResponse);
-					}
+    private void updateNewsList(String date) {
+        if (ZhihuDailyApplication.sIsConnected) {
+            if (mTodayDateString.equals(date)) {
+                requestLatestNews();
+            } else {
+                requestDailyNewsByDate(date);
+            }
+        } else {
+            readLastestNewsFromDB(date);
+        }
+    }
 
-					@Override
-					public void onSuccess(int statusCode, Header[] headers,
-							String responseBody) {
-						// TODO Auto-generated method stub
-						super.onSuccess(statusCode, headers, responseBody);
-						Log.d(TAG, "==onSuccess==" + responseBody);
-						Gson gson = new Gson();
-						DailyNewsModel model = gson.fromJson(responseBody,
-								DailyNewsModel.class);
+    private void requestLatestNews() {
+        ZhihuRequest.getDailyNewsToday(new JsonHttpResponseHandler() {
 
-						mListAdpater.updateList(model);
+            @Override
+            public void onFailure(int statusCode, Throwable e, JSONObject errorResponse) {
+                // TODO Auto-generated method stub
+                super.onFailure(statusCode, e, errorResponse);
+                Log.e(TAG, "==onFailure==" + errorResponse);
+            }
 
-						mFlowAdapter.updateList(model.getTopStories());
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, String responseBody) {
+                // TODO Auto-generated method stub
+                super.onSuccess(statusCode, headers, responseBody);
+                Log.d(TAG, "==onSuccess==" + responseBody);
+                Gson gson = new Gson();
+                DailyNewsModel model = gson.fromJson(responseBody, DailyNewsModel.class);
 
-						int newTimeStamp = Integer.valueOf(model.getNewsList()
-								.get(0).getGa_prefix());
+                mListAdpater.updateList(model);
 
-						// Add to cache and write to db
-						DataCache.getInstance().addDailyCache(model.getDate(),
-								model);
+                mFlowAdapter.updateList(model.getTopStories());
 
-						if (DataBaseManager.getInstance().checkDataExpire(
-								newTimeStamp)) {
-							// Write to db
-							Intent intent = new Intent(getActivity(),
-									DataService.class);
-							intent.putExtra(Constants.INTENT_CACHE_ID,
-									model.getDate());
-							intent.putExtra(Constants.INTENT_ACTION_TYPE,
-									Constants.ACTION_WRITE_DAILY_NEWS);
-							getActivity().startService(intent);
+                int newTimeStamp = Integer.valueOf(model.getNewsList().get(0).getGa_prefix());
 
-							// update timestamp
-							DataBaseManager.getInstance().setDataTimeStamp(
-									newTimeStamp);
-						}
+                // Add to cache and write to db
+                DataCache.getInstance().addDailyCache(model.getDate(), model);
 
-					}
+                if (DataBaseManager.getInstance().checkDataExpire(newTimeStamp)) {
+                    // Write to db
+                    Intent intent = new Intent(getActivity(), DataService.class);
+                    intent.putExtra(Constants.INTENT_CACHE_ID, model.getDate());
+                    intent.putExtra(Constants.INTENT_ACTION_TYPE, Constants.ACTION_WRITE_DAILY_NEWS);
+                    getActivity().startService(intent);
 
-				});
-	}
+                    // update timestamp
+                    DataBaseManager.getInstance().setDataTimeStamp(newTimeStamp);
+                }
 
-	private void readLastestNewsFromDB() {
-		Calendar calendar = Calendar.getInstance();
-		SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd",
-				Locale.CHINA);
-		String curdate = formatter.format(calendar.getTime());
-		// Read db data
-		Intent intent = new Intent(getActivity(), DataService.class);
-		intent.putExtra(Constants.INTENT_ACTION_TYPE,
-				Constants.ACTION_READ_DAILY_NEWS);
-		intent.putExtra(Constants.INTENT_NEWS_DATE, curdate);
-		getActivity().startService(intent);
-	}
+            }
 
-	private class ListItemClickListener implements ListView.OnItemClickListener {
+        });
+    }
 
-		@Override
-		public void onItemClick(AdapterView<?> parent, View view, int position,
-				long id) {
-			// TODO Auto-generated method stub
-			// ListItem item = (ListItem) mListAdpater.getItem(position);
-			ListItem item = (ListItem) parent.getItemAtPosition(position);
-			Intent intent = new Intent(getActivity(), NewsDetailActivity.class);
-			intent.putExtra(Constants.INTENT_NEWS_NUM, item.getSectionSize());
-			intent.putExtra(Constants.INTENT_NEWS_INDEX, item.getIndexOfDay());
-			intent.putExtra(Constants.INTENT_NEWS_DATE, item.getDate());
-			Log.d(TAG, "==index=" + item.getIndexOfDay() + "==pos=" + position);
+    private void readLastestNewsFromDB(String date) {
+        // Read db data
+        Intent intent = new Intent(getActivity(), DataService.class);
+        intent.putExtra(Constants.INTENT_ACTION_TYPE, Constants.ACTION_READ_DAILY_NEWS);
+        intent.putExtra(Constants.INTENT_NEWS_DATE, date);
+        getActivity().startService(intent);
+    }
 
-			startActivity(intent);
-		}
-	}
+    private void requestDailyNewsByDate(String date) {
+        ZhihuRequest.getDailyNewsByDate(date, new JsonHttpResponseHandler() {
 
-	@Override
-	public void onRefresh() {
-		// TODO Auto-generated method stub
-		new Handler().postDelayed(new Runnable() {
-			@Override
-			public void run() {
-				mSwipeRefreshLayout.setRefreshing(false);
-			}
-		}, 3000);
-	}
+            @Override
+            public void onFailure(int statusCode, Throwable e, JSONObject errorResponse) {
+                // TODO Auto-generated method stub
+                super.onFailure(statusCode, e, errorResponse);
+                Log.e(TAG, "==onFailure==" + errorResponse);
+            }
 
-	private OnScrollListener mOnScrollListener = new OnScrollListener() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, String responseBody) {
+                // TODO Auto-generated method stub
+                super.onSuccess(statusCode, headers, responseBody);
+                Log.d(TAG, "==onSuccess==" + responseBody);
+                Gson gson = new Gson();
+                DailyNewsModel model = gson.fromJson(responseBody, DailyNewsModel.class);
 
-		@Override
-		public void onScrollStateChanged(AbsListView view, int scrollState) {
-			// TODO Auto-generated method stub
+                // Add date to each news model
+                String date = model.getDate();
+                for (NewsModel news : model.getNewsList()) {
+                    news.setDate(date);
+                }
 
-		}
+                mListAdpater.updateList(model);
 
-		@Override
-		public void onScroll(AbsListView view, int firstVisibleItem,
-				int visibleItemCount, int totalItemCount) {
-			// TODO Auto-generated method stub
-			int visiblePostion = mListView.getFirstVisiblePosition();
-			int newAlpha;
-			if (visiblePostion == 0) {
-				View c = mListView.getChildAt(0);
-				int scrolly = -c.getTop() + mListView.getFirstVisiblePosition()
-						* c.getHeight();
-				// Log.e(TAG, "==onScrollStateChanged==  c.getTop()=" +
-				// c.getTop() + "   c.getHeight()=" + c.getHeight()
-				// + "  Pos=" + mListView.getFirstVisiblePosition());
-				mHeaderHeight = mHeaderView.getHeight();
-				final float ratio = (float) Math.min(Math.max(scrolly, 0),
-						mHeaderHeight) / mHeaderHeight;
-				newAlpha = (int) (ratio * 255);
-				// Log.e(TAG, "==onScrollStateChanged==  Y=" + scrolly +
-				// "   mHeaderHeight=" + mHeaderHeight + "  Alpha="
-				// + newAlpha);
-				((MainActivity) getActivity()).setActionBarAlpha(newAlpha);
+                mFlowAdapter.updateList(model.getTopStories());
 
-			} else {
-				newAlpha = 255;
-			}
-			((MainActivity) getActivity()).setActionBarAlpha(newAlpha);
-		}
+                int newTimeStamp = Integer.valueOf(model.getNewsList().get(0).getGa_prefix());
 
-	};
+                // Add to cache and write to db
+                DataCache.getInstance().addDailyCache(model.getDate(), model);
 
-	private class DataReadyReceiver extends BroadcastReceiver {
-		// Prevents instantiation
-		private DataReadyReceiver() {
-		}
+                if (DataBaseManager.getInstance().checkDataExpire(newTimeStamp)) {
+                    // Write to db
+                    Intent intent = new Intent(getActivity(), DataService.class);
+                    intent.putExtra(Constants.INTENT_CACHE_ID, model.getDate());
+                    intent.putExtra(Constants.INTENT_ACTION_TYPE, Constants.ACTION_WRITE_DAILY_NEWS);
+                    getActivity().startService(intent);
 
-		@Override
-		public void onReceive(Context context, Intent intent) {
-			// TODO Auto-generated method stub
-			String action = intent.getAction();
-			if (Constants.ACTION_NOTIFY_UI.equals(action)) {
-				String date = intent.getStringExtra(Constants.EXTRA_CACHE_KEY);
-				DailyNewsModel model = DataCache.getInstance()
-						.getDailyNewsModel(date);
+                    // update timestamp
+                    DataBaseManager.getInstance().setDataTimeStamp(newTimeStamp);
+                }
 
-				mListAdpater.updateList(model);
+            }
 
-				mFlowAdapter.updateList(model.getTopStories());
+        });
+    }
 
-			}
-		}
+    private class ListItemClickListener implements ListView.OnItemClickListener {
 
-	}
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            // TODO Auto-generated method stub
+            // ListItem item = (ListItem) mListAdpater.getItem(position);
+            ListItem item = (ListItem) parent.getItemAtPosition(position);
+            Intent intent = new Intent(getActivity(), NewsDetailActivity.class);
+            intent.putExtra(Constants.INTENT_NEWS_NUM, item.getSectionSize());
+            intent.putExtra(Constants.INTENT_NEWS_INDEX, item.getIndexOfDay());
+            intent.putExtra(Constants.INTENT_NEWS_DATE, item.getDate());
+            Log.d(TAG, "==index=" + item.getIndexOfDay() + "==pos=" + position);
+
+            startActivity(intent);
+        }
+    }
+
+    @Override
+    public void onRefresh() {
+        // TODO Auto-generated method stub
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mSwipeRefreshLayout.setRefreshing(false);
+            }
+        }, 3000);
+    }
+
+    private OnScrollListener mOnScrollListener = new OnScrollListener() {
+
+        @Override
+        public void onScrollStateChanged(AbsListView view, int scrollState) {
+            // TODO Auto-generated method stub
+
+        }
+
+        @Override
+        public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+            // TODO Auto-generated method stub
+            int visiblePostion = mListView.getFirstVisiblePosition();
+            int newAlpha;
+            if (visiblePostion == 0) {
+                View c = mListView.getChildAt(0);
+                int scrolly = -c.getTop() + mListView.getFirstVisiblePosition() * c.getHeight();
+                // Log.e(TAG, "==onScrollStateChanged==  c.getTop()=" +
+                // c.getTop() + "   c.getHeight()=" + c.getHeight()
+                // + "  Pos=" + mListView.getFirstVisiblePosition());
+                mHeaderHeight = mHeaderView.getHeight();
+                final float ratio = (float) Math.min(Math.max(scrolly, 0), mHeaderHeight) / mHeaderHeight;
+                newAlpha = (int) (ratio * 255);
+                // Log.e(TAG, "==onScrollStateChanged==  Y=" + scrolly +
+                // "   mHeaderHeight=" + mHeaderHeight + "  Alpha="
+                // + newAlpha);
+                ((MainActivity) getActivity()).setActionBarAlpha(newAlpha);
+
+            } else {
+                newAlpha = 255;
+            }
+            ((MainActivity) getActivity()).setActionBarAlpha(newAlpha);
+        }
+
+    };
+
+    private class DataReadyReceiver extends BroadcastReceiver {
+        // Prevents instantiation
+        private DataReadyReceiver() {
+        }
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            // TODO Auto-generated method stub
+            //            String action = intent.getAction();
+            //            if (Constants.ACTION_NOTIFY_UI.equals(action)) {
+            String date = intent.getStringExtra(Constants.EXTRA_CACHE_KEY);
+            DailyNewsModel model = DataCache.getInstance().getDailyNewsModel(date);
+
+            mListAdpater.updateList(model);
+
+            mFlowAdapter.updateList(model.getTopStories());
+
+            //            }
+        }
+
+    }
 }

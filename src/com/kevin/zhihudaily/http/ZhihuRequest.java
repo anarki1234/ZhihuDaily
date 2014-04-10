@@ -68,7 +68,7 @@ public class ZhihuRequest {
      */
     public static final String GET_SECTION_BY_DATE = "http://news-at.zhihu.com/api/2/section/2/before/";
 
-    public static void get(String url, RequestParams params, AsyncHttpResponseHandler responseHandler) {
+    private static void get(String url, RequestParams params, AsyncHttpResponseHandler responseHandler) {
         mHttpClient.get(getAbsoluteUrl(url), params, responseHandler);
     }
 
@@ -79,5 +79,13 @@ public class ZhihuRequest {
 
     public static void getNewsDetail(String url, AsyncHttpResponseHandler responseHandler) {
         mHttpClient.get(url, null, responseHandler);
+    }
+
+    public static void getDailyNewsToday(AsyncHttpResponseHandler responseHandler) {
+        get(GET_LATEST_NEWS, null, responseHandler);
+    }
+
+    public static void getDailyNewsByDate(String date, AsyncHttpResponseHandler responseHandler) {
+        get(GET_OLD_NEWS + date, null, responseHandler);
     }
 }

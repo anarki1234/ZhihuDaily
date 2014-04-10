@@ -1,5 +1,7 @@
 package com.kevin.zhihudaily.db;
 
+import java.util.ArrayList;
+
 import android.annotation.SuppressLint;
 import android.util.SparseArray;
 
@@ -12,10 +14,12 @@ public class DataCache {
     private SparseArray<DailyNewsModel> mDailyMap;
     private SparseArray<NewsModel> mNewsMap;
     private static final int CACHE_MAX_SIZE = 10;
+    private SparseArray<String> mBodyMap;
 
     private DataCache() {
         mDailyMap = new SparseArray<DailyNewsModel>();
         mNewsMap = new SparseArray<NewsModel>();
+        mBodyMap = new SparseArray<String>();
     }
 
     public static DataCache getInstance() {
@@ -60,5 +64,54 @@ public class DataCache {
 
     public void clearNewsCache() {
         mNewsMap.clear();
+    }
+
+    public boolean updateNewsBodyByID(String key, int id, String body) {
+        DailyNewsModel dailyModel = mDailyMap.get(key.hashCode());
+        ArrayList<NewsModel> list = (ArrayList<NewsModel>) dailyModel.getNewsList();
+        for (NewsModel model : list) {
+            if (model.getId() == id) {
+                model.setBody(body);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public NewsModel getNewsModelByDateAndID(String key, int id) {
+        if (key == null || id == -1) {
+            return null;
+        }
+        DailyNewsModel dailyModel = mDailyMap.get(key.hashCode());
+        ArrayList<NewsModel> list = (ArrayList<NewsModel>) dailyModel.getNewsList();
+        for (NewsModel model : list) {
+            if (model.getId() == id) {
+                return model;
+            }
+        }
+        return null;
+    }
+
+    public String getNewsBodyByDateAndID(String key, int id) {
+        DailyNewsModel dailyModel = mDailyMap.get(key.hashCode());
+        ArrayList<NewsModel> list = (ArrayList<NewsModel>) dailyModel.getNewsList();
+        for (NewsModel model : list) {
+            if (model.getId() == id) {
+                return model.getBody();
+            }
+        }
+        return null;
+    }
+
+    public void addNewsBodyCache(int id, String body) {
+        mBodyMap.put(id, body);
+    }
+
+    public String getNewsBodyCache(int id) {
+        return mBodyMap.get(id);
+    }
+
+    public void clearNewsBodyCache() {
+        mBodyMap.clear();
     }
 }
