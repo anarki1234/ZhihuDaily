@@ -16,191 +16,216 @@ import com.kevin.zhihudaily.model.DailyNewsModel;
 import com.kevin.zhihudaily.model.NewsModel;
 
 public class DataBaseManager {
-    private static final String TAG = "DataBaseManager";
-    private DataBaseHelper mHelper;
-    private SQLiteDatabase db;
-    private static DataBaseManager mInstance;
-    private static Context mContext;
+	private static final String TAG = "DataBaseManager";
+	private DataBaseHelper mHelper;
+	private SQLiteDatabase db;
+	private static DataBaseManager mInstance;
+	private static Context mContext;
 
-    private DataBaseManager(Context context) {
-        mHelper = new DataBaseHelper(context);
+	private DataBaseManager(Context context) {
+		mHelper = new DataBaseHelper(context);
 
-        db = mHelper.getWritableDatabase();
+		db = mHelper.getWritableDatabase();
 
-        initDataTimeStamp();
-    }
+		initDataTimeStamp();
+	}
 
-    public static DataBaseManager newInstance(Context context) {
-        if (mInstance == null) {
-            mContext = context;
-            mInstance = new DataBaseManager(context);
-        }
-        return mInstance;
-    }
+	public static DataBaseManager newInstance(Context context) {
+		if (mInstance == null) {
+			mContext = context;
+			mInstance = new DataBaseManager(context);
+		}
+		return mInstance;
+	}
 
-    public static DataBaseManager getInstance() {
-        return mInstance;
-    }
+	public static DataBaseManager getInstance() {
+		return mInstance;
+	}
 
-    public void closeDB() {
-        Log.e(TAG, "==closeDB==");
-        new Exception().printStackTrace();
-        db.close();
-        //        mHelper = null;
-    }
+	public void closeDB() {
+		Log.e(TAG, "==closeDB==");
+		new Exception().printStackTrace();
+		db.close();
+		// mHelper = null;
+	}
 
-    private void initDataTimeStamp() {
-        SharedPreferences timestamp = mContext.getSharedPreferences(DataBaseConstants.SHARED_PREFERENCES_NAME,
-                Context.MODE_PRIVATE);
-        DataBaseConstants.TIME_STAMP_ID = timestamp.getInt(DataBaseConstants.SP_TIME_STAMP, 0);
-    }
+	private void initDataTimeStamp() {
+		SharedPreferences timestamp = mContext
+				.getSharedPreferences(
+						DataBaseConstants.SHARED_PREFERENCES_NAME,
+						Context.MODE_PRIVATE);
+		DataBaseConstants.TIME_STAMP_ID = timestamp.getInt(
+				DataBaseConstants.SP_TIME_STAMP, 0);
+	}
 
-    public int getDataTimeStamp() {
-        return DataBaseConstants.TIME_STAMP_ID;
-    }
+	public int getDataTimeStamp() {
+		return DataBaseConstants.TIME_STAMP_ID;
+	}
 
-    /**
-     * 判断本地数据是否过期，返回true表示已过期需要更新，反之返回false
-     * @param timestamp
-     * @return
-     */
-    public boolean checkDataExpire(int timestamp) {
-        if (timestamp > DataBaseConstants.TIME_STAMP_ID) {
-            return true;
-        } else {
-            return false;
-        }
-    }
+	/**
+	 * 判断本地数据是否过期，返回true表示已过期需要更新，反之返回false
+	 * 
+	 * @param timestamp
+	 * @return
+	 */
+	public boolean checkDataExpire(int timestamp) {
+		if (timestamp > DataBaseConstants.TIME_STAMP_ID) {
+			return true;
+		} else {
+			return false;
+		}
+	}
 
-    public void setDataTimeStamp(int timestamp) {
-        DataBaseConstants.TIME_STAMP_ID = timestamp;
-        SharedPreferences sp = mContext.getSharedPreferences(DataBaseConstants.SHARED_PREFERENCES_NAME,
-                Context.MODE_PRIVATE);
-        Editor editor = sp.edit();
-        editor.putInt(DataBaseConstants.SP_TIME_STAMP, timestamp);
-        editor.commit();
-    }
+	public void setDataTimeStamp(int timestamp) {
+		DataBaseConstants.TIME_STAMP_ID = timestamp;
+		SharedPreferences sp = mContext
+				.getSharedPreferences(
+						DataBaseConstants.SHARED_PREFERENCES_NAME,
+						Context.MODE_PRIVATE);
+		Editor editor = sp.edit();
+		editor.putInt(DataBaseConstants.SP_TIME_STAMP, timestamp);
+		editor.commit();
+	}
 
-    public int writeDailyNewsToDB(DailyNewsModel dailyNewsModel) {
-        Log.d(TAG, "==writeDailyNewsToDB");
-        int count = 0;
-        if (dailyNewsModel == null) {
-            return 0;
-        }
+	public int writeDailyNewsToDB(DailyNewsModel dailyNewsModel) {
+		Log.d(TAG, "==writeDailyNewsToDB");
+		int count = 0;
+		if (dailyNewsModel == null) {
+			return 0;
+		}
 
-        if (!db.isOpen()) {
-            db = mHelper.getReadableDatabase();
-        }
+		if (!db.isOpen()) {
+			db = mHelper.getReadableDatabase();
+		}
 
-        db.beginTransaction();
-        try {
-            String date = dailyNewsModel.getDate();
+		db.beginTransaction();
+		try {
+			String date = dailyNewsModel.getDate();
 
-            List<NewsModel> topList = dailyNewsModel.getTopStories();
-            SparseBooleanArray topIDMap = new SparseBooleanArray();
-            for (NewsModel topModel : topList) {
-                topIDMap.put(topModel.getId(), true);
-            }
+			List<NewsModel> topList = dailyNewsModel.getTopStories();
+			SparseBooleanArray topIDMap = new SparseBooleanArray();
+			for (NewsModel topModel : topList) {
+				topIDMap.put(topModel.getId(), true);
+			}
 
-            List<NewsModel> newList = dailyNewsModel.getNewsList();
-            for (NewsModel model : newList) {
-                ContentValues values = new ContentValues();
-                values.put(DataBaseConstants.ID, model.getId());
-                values.put(DataBaseConstants.DATE, date);
-                if (topIDMap.get(model.getId())) {
-                    values.put(DataBaseConstants.IS_TOP_STORY, 1);
-                } else {
-                    values.put(DataBaseConstants.IS_TOP_STORY, 0);
-                }
+			List<NewsModel> newList = dailyNewsModel.getNewsList();
+			for (NewsModel model : newList) {
+				ContentValues values = new ContentValues();
+				values.put(DataBaseConstants.ID, model.getId());
+				values.put(DataBaseConstants.DATE, date);
+				if (topIDMap.get(model.getId())) {
+					values.put(DataBaseConstants.IS_TOP_STORY, 1);
+				} else {
+					values.put(DataBaseConstants.IS_TOP_STORY, 0);
+				}
 
-                values.put(DataBaseConstants.GA_PREFIX, model.getGa_prefix());
-                values.put(DataBaseConstants.TITLE, model.getTitle());
-                values.put(DataBaseConstants.URL, model.getUrl());
-                Log.e(TAG, "==Image_source" + model.getImage_source());
-                values.put(DataBaseConstants.IMAGE_SOURCE, model.getImage_source());
-                values.put(DataBaseConstants.IMAGE_URL, model.getImage());
-                values.put(DataBaseConstants.IMAGE_THUMBNAIL, model.getThumbnail());
-                values.put(DataBaseConstants.SHARE_URL, model.getShare_url());
-                values.put(DataBaseConstants.BODY, model.getBody());
+				values.put(DataBaseConstants.GA_PREFIX, model.getGa_prefix());
+				values.put(DataBaseConstants.TITLE, model.getTitle());
+				values.put(DataBaseConstants.URL, model.getUrl());
+				Log.e(TAG, "==Image_source" + model.getImage_source());
+				values.put(DataBaseConstants.IMAGE_SOURCE,
+						model.getImage_source());
+				values.put(DataBaseConstants.IMAGE_URL, model.getImage());
+				values.put(DataBaseConstants.IMAGE_THUMBNAIL,
+						model.getThumbnail());
+				values.put(DataBaseConstants.SHARE_URL, model.getShare_url());
+				values.put(DataBaseConstants.BODY, model.getBody());
 
-                db.insertWithOnConflict(DataBaseConstants.NEWS_TABLE_NAME, null, values,
-                        SQLiteDatabase.CONFLICT_REPLACE);
+				db.insertWithOnConflict(DataBaseConstants.NEWS_TABLE_NAME,
+						null, values, SQLiteDatabase.CONFLICT_REPLACE);
 
-                count++;
-            }
-            db.setTransactionSuccessful();
-        } catch (Exception e) {
-            // TODO: handle exception
-        } finally {
-            db.endTransaction();
-        }
-        return count;
-    }
+				count++;
+			}
+			db.setTransactionSuccessful();
+		} catch (Exception e) {
+			// TODO: handle exception
+		} finally {
+			db.endTransaction();
+		}
+		return count;
+	}
 
-    public int writeNewsToDB(NewsModel model) {
-        Log.d(TAG, "==writeDailyNewsToDB");
-        int count = 0;
-        if (model == null) {
-            return 0;
-        }
+	public int writeNewsToDB(NewsModel model) {
+		Log.d(TAG, "==writeDailyNewsToDB");
+		int count = 0;
+		if (model == null) {
+			return 0;
+		}
 
-        if (!db.isOpen()) {
-            db = mHelper.getReadableDatabase();
-        }
+		if (!db.isOpen()) {
+			db = mHelper.getReadableDatabase();
+		}
 
-        db.beginTransaction();
-        try {
-            ContentValues values = new ContentValues();
-            values.put(DataBaseConstants.BODY, model.getBody());
+		db.beginTransaction();
+		try {
+			ContentValues values = new ContentValues();
+			values.put(DataBaseConstants.BODY, model.getBody());
 
-            db.updateWithOnConflict(DataBaseConstants.NEWS_TABLE_NAME, values,
-                    DataBaseConstants.ID + "=" + model.getId(), null, SQLiteDatabase.CONFLICT_REPLACE);
-        } catch (Exception e) {
-            // TODO: handle exception
-        } finally {
-            db.endTransaction();
-        }
-        return count;
-    }
+			db.updateWithOnConflict(DataBaseConstants.NEWS_TABLE_NAME, values,
+					DataBaseConstants.ID + "=" + model.getId(), null,
+					SQLiteDatabase.CONFLICT_REPLACE);
+		} catch (Exception e) {
+			// TODO: handle exception
+		} finally {
+			db.endTransaction();
+		}
+		return count;
+	}
 
-    public DailyNewsModel readDaliyNewsList(String date) {
-        DailyNewsModel dailyModel = null;
-        if (!db.isOpen()) {
-            db = mHelper.getReadableDatabase();
-        }
+	public DailyNewsModel readDaliyNewsList(String date) {
+		DailyNewsModel dailyModel = null;
+		if (!db.isOpen()) {
+			db = mHelper.getReadableDatabase();
+		}
 
-        String[] columns = { DataBaseConstants.ID, DataBaseConstants.DATE, DataBaseConstants.IS_TOP_STORY,
-                DataBaseConstants.TITLE, DataBaseConstants.URL, DataBaseConstants.IMAGE_SOURCE,
-                DataBaseConstants.IMAGE_URL, DataBaseConstants.IMAGE_THUMBNAIL, DataBaseConstants.SHARE_URL };
-        String selection = "date=?";
-        String[] selectionArgs = { date };
-        Cursor cursor = db
-                .query(DataBaseConstants.NEWS_TABLE_NAME, columns, selection, selectionArgs, null, null, null);
-        if (cursor != null) {
-            dailyModel = new DailyNewsModel();
-            ArrayList<NewsModel> newsList = new ArrayList<NewsModel>();
-            while (cursor.moveToNext()) {
-                NewsModel model = new NewsModel();
-                model.setId(cursor.getInt(cursor.getColumnIndexOrThrow(DataBaseConstants.ID)));
-                model.setDate(cursor.getString(cursor.getColumnIndexOrThrow(DataBaseConstants.DATE)));
-                //                model.setGa_prefix(cursor.getString(cursor.getColumnIndexOrThrow(DataBaseConstants.GA_PREFIX)));
-                model.setIs_top_story(cursor.getInt(cursor.getColumnIndexOrThrow(DataBaseConstants.IS_TOP_STORY)));
-                model.setTitle(cursor.getString(cursor.getColumnIndexOrThrow(DataBaseConstants.TITLE)));
-                model.setUrl(cursor.getString(cursor.getColumnIndexOrThrow(DataBaseConstants.URL)));
-                model.setImage_source(cursor.getString(cursor.getColumnIndexOrThrow(DataBaseConstants.IMAGE_SOURCE)));
-                model.setImage(cursor.getString(cursor.getColumnIndexOrThrow(DataBaseConstants.IMAGE_URL)));
-                model.setThumbnail(cursor.getString(cursor.getColumnIndexOrThrow(DataBaseConstants.IMAGE_THUMBNAIL)));
-                model.setShare_url(cursor.getString(cursor.getColumnIndexOrThrow(DataBaseConstants.SHARE_URL)));
-                newsList.add(model);
-            }
-            dailyModel.setNewsList(newsList);
-            dailyModel.setDate(newsList.get(0).getDate());
-            cursor.close();
-        }
-        return dailyModel;
-    }
+		String[] columns = { DataBaseConstants.ID, DataBaseConstants.DATE,
+				DataBaseConstants.IS_TOP_STORY, DataBaseConstants.TITLE,
+				DataBaseConstants.URL, DataBaseConstants.IMAGE_SOURCE,
+				DataBaseConstants.IMAGE_URL, DataBaseConstants.IMAGE_THUMBNAIL,
+				DataBaseConstants.SHARE_URL };
+		String selection = "date=?";
+		String[] selectionArgs = { date };
+		Cursor cursor = db.query(DataBaseConstants.NEWS_TABLE_NAME, columns,
+				selection, selectionArgs, null, null, null);
+		if (cursor != null) {
+			dailyModel = new DailyNewsModel();
+			ArrayList<NewsModel> newsList = new ArrayList<NewsModel>();
+			ArrayList<NewsModel> topStories = new ArrayList<NewsModel>();
+			while (cursor.moveToNext()) {
+				NewsModel model = new NewsModel();
+				model.setId(cursor.getInt(cursor
+						.getColumnIndexOrThrow(DataBaseConstants.ID)));
+				model.setDate(cursor.getString(cursor
+						.getColumnIndexOrThrow(DataBaseConstants.DATE)));
+				// model.setGa_prefix(cursor.getString(cursor.getColumnIndexOrThrow(DataBaseConstants.GA_PREFIX)));
+				model.setIs_top_story(cursor.getInt(cursor
+						.getColumnIndexOrThrow(DataBaseConstants.IS_TOP_STORY)));
+				model.setTitle(cursor.getString(cursor
+						.getColumnIndexOrThrow(DataBaseConstants.TITLE)));
+				model.setUrl(cursor.getString(cursor
+						.getColumnIndexOrThrow(DataBaseConstants.URL)));
+				model.setImage_source(cursor.getString(cursor
+						.getColumnIndexOrThrow(DataBaseConstants.IMAGE_SOURCE)));
+				model.setImage(cursor.getString(cursor
+						.getColumnIndexOrThrow(DataBaseConstants.IMAGE_URL)));
+				model.setThumbnail(cursor.getString(cursor
+						.getColumnIndexOrThrow(DataBaseConstants.IMAGE_THUMBNAIL)));
+				model.setShare_url(cursor.getString(cursor
+						.getColumnIndexOrThrow(DataBaseConstants.SHARE_URL)));
+				newsList.add(model);
+				if (model.isIs_top_story() == 1) {
+					topStories.add(model);
+				}
+			}
+			dailyModel.setNewsList(newsList);
+			dailyModel.setTopStories(topStories);
+			dailyModel.setDate(newsList.get(0).getDate());
+			cursor.close();
+		}
+		return dailyModel;
+	}
 
-    public List<NewsModel> readNewsDetail(String date) {
-        return null;
-    }
+	public List<NewsModel> readNewsDetail(String date) {
+		return null;
+	}
 }
