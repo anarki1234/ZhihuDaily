@@ -240,7 +240,7 @@ public class DataBaseManager {
         String[] selectionArgs = { id + "" };
         Cursor cursor = db
                 .query(DataBaseConstants.NEWS_TABLE_NAME, columns, selection, selectionArgs, null, null, null);
-        if (cursor != null && cursor.getCount() > 0) {
+        if (cursor != null && cursor.getCount() > 0 && cursor.moveToFirst()) {
             // read body
             body = cursor.getString(cursor.getColumnIndexOrThrow(DataBaseConstants.BODY));
             Log.d(TAG, "==body=" + body);

@@ -97,7 +97,7 @@ public class BroadcastNotifier {
     public void notifyDailyNewsDataReady(String cacheKey) {
         Intent localIntent = new Intent();
 
-        localIntent.setAction(Constants.ACTION_NOTIFY_UI);
+        localIntent.setAction(Constants.ACTION_NOTIFY_DAILY_NEWS_READY);
 
         localIntent.putExtra(Constants.EXTRA_CACHE_KEY, cacheKey);
 
@@ -107,7 +107,7 @@ public class BroadcastNotifier {
     public void notifyNewsBodyDataReady(String date, int id) {
         Intent localIntent = new Intent();
 
-        localIntent.setAction(Constants.ACTION_NOTIFY_UI);
+        localIntent.setAction(Constants.ACTION_NOTIFY_NEWS_DETAIL_READY);
 
         localIntent.putExtra(Constants.INTENT_NEWS_DATE, date);
         localIntent.putExtra(Constants.INTENT_NEWS_ID, id);

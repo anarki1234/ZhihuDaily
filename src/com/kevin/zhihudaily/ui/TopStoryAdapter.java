@@ -108,8 +108,8 @@ public class TopStoryAdapter extends BaseAdapter {
         }
 
         NewsModel model = mDataList.get(position);
-        Picasso.with(mContextWR.get()).load(model.getImage()).placeholder(R.drawable.ic_header).fit().centerCrop()
-                .into(holder.imageView);
+        Picasso.with(mContextWR.get()).load(model.getImage()).placeholder(R.drawable.image_top_default).fit()
+                .centerCrop().into(holder.imageView);
 
         holder.titleTextView.setText(model.getTitle());
     }

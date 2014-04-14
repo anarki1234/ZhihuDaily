@@ -1,10 +1,14 @@
 package com.kevin.zhihudaily.http;
 
+import retrofit.RestAdapter;
+
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 
 public class ZhihuRequest {
+
+    private static ZhihuRequestService mRequestService;
 
     public static final String BASE_URL = "http://news.at.zhihu.com/api/2";
 
@@ -87,5 +91,14 @@ public class ZhihuRequest {
 
     public static void getDailyNewsByDate(String date, AsyncHttpResponseHandler responseHandler) {
         get(GET_OLD_NEWS + date, null, responseHandler);
+    }
+
+    public static ZhihuRequestService getRequestService() {
+        if (mRequestService == null) {
+            RestAdapter adapter = new RestAdapter.Builder().setEndpoint(BASE_URL).build();
+
+            mRequestService = adapter.create(ZhihuRequestService.class);
+        }
+        return mRequestService;
     }
 }

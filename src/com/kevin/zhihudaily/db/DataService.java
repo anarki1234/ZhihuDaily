@@ -6,6 +6,7 @@ import android.util.Log;
 
 import com.kevin.zhihudaily.Constants;
 import com.kevin.zhihudaily.http.BroadcastNotifier;
+import com.kevin.zhihudaily.http.ZhihuRequest;
 import com.kevin.zhihudaily.model.DailyNewsModel;
 import com.kevin.zhihudaily.model.NewsModel;
 
@@ -87,10 +88,57 @@ public class DataService extends IntentService {
                 mBroadcastNotifier.notifyNewsBodyDataReady(news_date, news_id);
             }
             break;
+        case Constants.ACTION_GET_TODAY_NEWS:
+            requestTodayNews();
+            break;
+        case Constants.ACTION_GET_DAILY_NEWS:
+            String date1 = intent.getStringExtra(Constants.INTENT_NEWS_DATE);
+            requestDailyNewsByDate(date1);
+            break;
+        case Constants.ACTION_GET_NEWS_DETAIL:
+            String date2 = intent.getStringExtra(Constants.INTENT_NEWS_DATE);
+            int id2 = intent.getIntExtra(Constants.INTENT_NEWS_ID, -1);
+            requestNewsDetail(date2, id2);
+            break;
         default:
             break;
         }
 
+    }
+
+    private void requestTodayNews() {
+        //        Log.d(TAG, "==IN=" + SystemClock.currentThreadTimeMillis());
+        DailyNewsModel model = ZhihuRequest.getRequestService().getDailyNewsToday();
+        Log.d(TAG, "==Model=" + model.getDisplay_date());
+        //        Log.d(TAG, "==OUT=" + SystemClock.currentThreadTimeMillis());
+
+        if (model != null) {
+            DataCache.getInstance().addDailyCache(model.getDate(), model);
+
+            // notify ui to update
+            mBroadcastNotifier.notifyDailyNewsDataReady(model.getDate());
+        }
+    }
+
+    private void requestDailyNewsByDate(String date) {
+        DailyNewsModel model = ZhihuRequest.getRequestService().getDailyNewsByDate(date);
+        if (model != null) {
+            DataCache.getInstance().addDailyCache(model.getDate(), model);
+
+            // notify ui to update
+            mBroadcastNotifier.notifyDailyNewsDataReady(model.getDate());
+        }
+    }
+
+    private void requestNewsDetail(String date, int id) {
+        NewsModel model = ZhihuRequest.getRequestService().getNewsById(id);
+        Log.d(TAG, "==ModelBody=" + model.getBody());
+        if (model != null) {
+            DataCache.getInstance().updateNewsBodyByID(date, id, model.getBody());
+
+            // Notify ui to update
+            mBroadcastNotifier.notifyNewsBodyDataReady(date, id);
+        }
     }
 
 }

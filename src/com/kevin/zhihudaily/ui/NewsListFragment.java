@@ -104,7 +104,7 @@ public class NewsListFragment extends Fragment implements SwipeRefreshLayout.OnR
         mTodayDate = calendar.getTime();
 
         mDataReadyReceiver = new DataReadyReceiver();
-        IntentFilter dataIntentFilter = new IntentFilter(Constants.ACTION_NOTIFY_UI);
+        IntentFilter dataIntentFilter = new IntentFilter(Constants.ACTION_NOTIFY_DAILY_NEWS_READY);
         dataIntentFilter.addCategory(Intent.CATEGORY_DEFAULT);
         LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mDataReadyReceiver, dataIntentFilter);
 
@@ -139,11 +139,19 @@ public class NewsListFragment extends Fragment implements SwipeRefreshLayout.OnR
     }
 
     private void updateNewsList(String date) {
+        //        ZhihuRequest.getRequestService();
         if (ZhihuDailyApplication.sIsConnected) {
             if (mTodayDateString.equals(date)) {
-                requestLatestNews();
+                //                requestLatestNews();
+                Intent intent = new Intent(getActivity(), DataService.class);
+                intent.putExtra(Constants.INTENT_ACTION_TYPE, Constants.ACTION_GET_TODAY_NEWS);
+                getActivity().startService(intent);
             } else {
-                requestDailyNewsByDate(date);
+                //requestDailyNewsByDate(date);
+                Intent intent = new Intent(getActivity(), DataService.class);
+                intent.putExtra(Constants.INTENT_ACTION_TYPE, Constants.ACTION_GET_DAILY_NEWS);
+                intent.putExtra(Constants.INTENT_NEWS_DATE, date);
+                getActivity().startService(intent);
             }
         } else {
             readLastestNewsFromDB(date);
@@ -219,31 +227,7 @@ public class NewsListFragment extends Fragment implements SwipeRefreshLayout.OnR
                 Gson gson = new Gson();
                 DailyNewsModel model = gson.fromJson(responseBody, DailyNewsModel.class);
 
-                // Add date to each news model
-                String date = model.getDate();
-                for (NewsModel news : model.getNewsList()) {
-                    news.setDate(date);
-                }
-
-                mListAdpater.updateList(model);
-
-                mFlowAdapter.updateList(model.getTopStories());
-
-                int newTimeStamp = Integer.valueOf(model.getNewsList().get(0).getGa_prefix());
-
-                // Add to cache and write to db
-                DataCache.getInstance().addDailyCache(model.getDate(), model);
-
-                if (DataBaseManager.getInstance().checkDataExpire(newTimeStamp)) {
-                    // Write to db
-                    Intent intent = new Intent(getActivity(), DataService.class);
-                    intent.putExtra(Constants.INTENT_CACHE_ID, model.getDate());
-                    intent.putExtra(Constants.INTENT_ACTION_TYPE, Constants.ACTION_WRITE_DAILY_NEWS);
-                    getActivity().startService(intent);
-
-                    // update timestamp
-                    DataBaseManager.getInstance().setDataTimeStamp(newTimeStamp);
-                }
+                updateNewsList(model);
 
             }
 
@@ -326,12 +310,39 @@ public class NewsListFragment extends Fragment implements SwipeRefreshLayout.OnR
             String date = intent.getStringExtra(Constants.EXTRA_CACHE_KEY);
             DailyNewsModel model = DataCache.getInstance().getDailyNewsModel(date);
 
-            mListAdpater.updateList(model);
-
-            mFlowAdapter.updateList(model.getTopStories());
+            updateNewsList(model);
 
             //            }
         }
 
+    }
+
+    private void updateNewsList(DailyNewsModel model) {
+
+        // Add date to each news model
+        String date = model.getDate();
+        for (NewsModel news : model.getNewsList()) {
+            news.setDate(date);
+        }
+
+        mListAdpater.updateList(model);
+
+        mFlowAdapter.updateList(model.getTopStories());
+
+        int newTimeStamp = Integer.valueOf(model.getNewsList().get(0).getGa_prefix());
+
+        //        // Add to cache and write to db
+        //        DataCache.getInstance().addDailyCache(model.getDate(), model);
+
+        if (DataBaseManager.getInstance().checkDataExpire(newTimeStamp)) {
+            // Write to db
+            Intent intent = new Intent(getActivity(), DataService.class);
+            intent.putExtra(Constants.INTENT_CACHE_ID, model.getDate());
+            intent.putExtra(Constants.INTENT_ACTION_TYPE, Constants.ACTION_WRITE_DAILY_NEWS);
+            getActivity().startService(intent);
+
+            // update timestamp
+            DataBaseManager.getInstance().setDataTimeStamp(newTimeStamp);
+        }
     }
 }
