@@ -2,17 +2,11 @@ package com.kevin.zhihudaily.http;
 
 import retrofit.RestAdapter;
 
-import com.loopj.android.http.AsyncHttpClient;
-import com.loopj.android.http.AsyncHttpResponseHandler;
-import com.loopj.android.http.RequestParams;
-
 public class ZhihuRequest {
 
     private static ZhihuRequestService mRequestService;
 
     public static final String BASE_URL = "http://news.at.zhihu.com/api/2";
-
-    private static AsyncHttpClient mHttpClient = new AsyncHttpClient();
 
     /**
      * 最新消息
@@ -71,27 +65,6 @@ public class ZhihuRequest {
      * （加上一个时间戳，下一个时间戳的时间详见JSON数据最后）
      */
     public static final String GET_SECTION_BY_DATE = "http://news-at.zhihu.com/api/2/section/2/before/";
-
-    private static void get(String url, RequestParams params, AsyncHttpResponseHandler responseHandler) {
-        mHttpClient.get(getAbsoluteUrl(url), params, responseHandler);
-    }
-
-    private static String getAbsoluteUrl(String relativeUrl) {
-        return BASE_URL + relativeUrl;
-
-    }
-
-    public static void getNewsDetail(String url, AsyncHttpResponseHandler responseHandler) {
-        mHttpClient.get(url, null, responseHandler);
-    }
-
-    public static void getDailyNewsToday(AsyncHttpResponseHandler responseHandler) {
-        get(GET_LATEST_NEWS, null, responseHandler);
-    }
-
-    public static void getDailyNewsByDate(String date, AsyncHttpResponseHandler responseHandler) {
-        get(GET_OLD_NEWS + date, null, responseHandler);
-    }
 
     public static ZhihuRequestService getRequestService() {
         if (mRequestService == null) {

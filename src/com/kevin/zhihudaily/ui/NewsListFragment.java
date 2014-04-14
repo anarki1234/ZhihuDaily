@@ -5,8 +5,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
-import org.apache.http.Header;
-import org.json.JSONObject;
 import org.taptwo.android.widget.CircleFlowIndicator;
 
 import android.annotation.TargetApi;
@@ -29,18 +27,15 @@ import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
-import com.google.gson.Gson;
 import com.kevin.zhihudaily.Constants;
 import com.kevin.zhihudaily.R;
 import com.kevin.zhihudaily.ZhihuDailyApplication;
 import com.kevin.zhihudaily.db.DataBaseManager;
 import com.kevin.zhihudaily.db.DataCache;
 import com.kevin.zhihudaily.db.DataService;
-import com.kevin.zhihudaily.http.ZhihuRequest;
 import com.kevin.zhihudaily.model.DailyNewsModel;
 import com.kevin.zhihudaily.model.NewsModel;
 import com.kevin.zhihudaily.ui.NewsListAdapter.ListItem;
-import com.loopj.android.http.JsonHttpResponseHandler;
 
 public class NewsListFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
 
@@ -159,69 +154,12 @@ public class NewsListFragment extends Fragment implements SwipeRefreshLayout.OnR
         }
     }
 
-    private void requestLatestNews() {
-        ZhihuRequest.getDailyNewsToday(new JsonHttpResponseHandler() {
-
-            @Override
-            public void onFailure(int statusCode, Throwable e, JSONObject errorResponse) {
-                // TODO Auto-generated method stub
-                super.onFailure(statusCode, e, errorResponse);
-                Log.e(TAG, "==onFailure==" + errorResponse);
-            }
-
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, String responseBody) {
-                // TODO Auto-generated method stub
-                super.onSuccess(statusCode, headers, responseBody);
-                Log.d(TAG, "==onSuccess==" + responseBody);
-                Gson gson = new Gson();
-                DailyNewsModel model = gson.fromJson(responseBody, DailyNewsModel.class);
-
-                updateNewsList(model);
-
-            }
-
-        });
-    }
-
     private void readLastestNewsFromDB(String date) {
         // Read db data
         Intent intent = new Intent(getActivity(), DataService.class);
         intent.putExtra(Constants.INTENT_ACTION_TYPE, Constants.ACTION_READ_DAILY_NEWS);
         intent.putExtra(Constants.INTENT_NEWS_DATE, date);
         getActivity().startService(intent);
-    }
-
-    private void requestDailyNewsByDate(String date) {
-        ZhihuRequest.getDailyNewsByDate(date, new JsonHttpResponseHandler() {
-
-            @Override
-            public void onFailure(int statusCode, Throwable e, JSONObject errorResponse) {
-                // TODO Auto-generated method stub
-                super.onFailure(statusCode, e, errorResponse);
-                Log.e(TAG, "==onFailure==" + errorResponse);
-            }
-
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, String responseBody) {
-                // TODO Auto-generated method stub
-                super.onSuccess(statusCode, headers, responseBody);
-                Log.d(TAG, "==onSuccess==" + responseBody);
-                Gson gson = new Gson();
-                DailyNewsModel model = gson.fromJson(responseBody, DailyNewsModel.class);
-
-                // Add date to each news model
-                updateNewsList(model);
-                int newTimeStamp = Integer.valueOf(model.getNewsList().get(0).getGa_prefix());
-                // Add to cache and write to db
-                // Write to db
-                //intent.putExtra(Constants.INTENT_ACTION_TYPE, Constants.ACTION_WRITE_DAILY_NEWS);
-                // update timestamp
-                DataBaseManager.getInstance().setDataTimeStamp(newTimeStamp);
-
-            }
-
-        });
     }
 
     private class ListItemClickListener implements ListView.OnItemClickListener {

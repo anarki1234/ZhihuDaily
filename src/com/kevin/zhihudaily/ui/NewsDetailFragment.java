@@ -1,8 +1,5 @@
 package com.kevin.zhihudaily.ui;
 
-import org.apache.http.Header;
-import org.json.JSONObject;
-
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -12,7 +9,6 @@ import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -20,15 +16,12 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.google.gson.Gson;
 import com.kevin.zhihudaily.Constants;
 import com.kevin.zhihudaily.R;
 import com.kevin.zhihudaily.ZhihuDailyApplication;
 import com.kevin.zhihudaily.db.DataCache;
 import com.kevin.zhihudaily.db.DataService;
-import com.kevin.zhihudaily.http.ZhihuRequest;
 import com.kevin.zhihudaily.model.NewsModel;
-import com.loopj.android.http.JsonHttpResponseHandler;
 import com.squareup.picasso.Picasso;
 
 public class NewsDetailFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
@@ -195,48 +188,6 @@ public class NewsDetailFragment extends Fragment implements SwipeRefreshLayout.O
         }
     }
 
-    private void requestNewsDetail() {
-        String url = mNewsModel.getUrl();
-        Log.d(TAG, "==URL==" + url);
-        ZhihuRequest.getNewsDetail(url, new JsonHttpResponseHandler() {
-
-            @Override
-            public void onFailure(Throwable e, JSONObject errorResponse) {
-                // TODO Auto-generated method stub
-                super.onFailure(e, errorResponse);
-                Log.d(TAG, "==onFailure==" + errorResponse);
-            }
-
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, String responseBody) {
-                // TODO Auto-generated method stub
-                super.onSuccess(statusCode, headers, responseBody);
-                Log.d(TAG, "==onSuccess==" + responseBody);
-                Gson gson = new Gson();
-                NewsModel model = gson.fromJson(responseBody, NewsModel.class);
-
-                mNewsModel.setBody(model.getBody());
-
-                updateWebView(model.getBody());
-                //                AsyncRunnable runnable = new AsyncRunnable(model);
-                //                getActivity().runOnUiThread(runnable);
-
-                // Add to cache
-                mNewsModel.setBody(model.getBody());
-                //                DataCache.getInstance().updateNewsBodyByID(model.getDate(), model.getId(), model.getBody());
-
-                // Write to db
-                Intent intent = new Intent(getActivity(), DataService.class);
-                intent.putExtra(Constants.INTENT_NEWS_ID, model.getId());
-                intent.putExtra(Constants.INTENT_NEWS_BODY, model.getBody());
-                intent.putExtra(Constants.INTENT_ACTION_TYPE, Constants.ACTION_WRITE_NEWS_DEATIL);
-                getActivity().startService(intent);
-            }
-
-        });
-
-    }
-
     private void readNewsDetailFromDB() {
         // Read db data
         Intent intent = new Intent(getActivity(), DataService.class);
@@ -295,6 +246,13 @@ public class NewsDetailFragment extends Fragment implements SwipeRefreshLayout.O
 
                 // Update ui
                 updateWebView(body);
+
+                // Write to db
+                Intent dbintent = new Intent(getActivity(), DataService.class);
+                intent.putExtra(Constants.INTENT_NEWS_ID, id);
+                intent.putExtra(Constants.INTENT_NEWS_BODY, body);
+                intent.putExtra(Constants.INTENT_ACTION_TYPE, Constants.ACTION_WRITE_NEWS_DEATIL);
+                getActivity().startService(intent);
             }
         }
 
