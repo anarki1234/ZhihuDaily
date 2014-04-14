@@ -154,6 +154,7 @@ public class NewsListFragment extends Fragment implements SwipeRefreshLayout.OnR
                 getActivity().startService(intent);
             }
         } else {
+            Log.e(TAG, "==DB-Mode==" + date);
             readLastestNewsFromDB(date);
         }
     }
@@ -176,25 +177,7 @@ public class NewsListFragment extends Fragment implements SwipeRefreshLayout.OnR
                 Gson gson = new Gson();
                 DailyNewsModel model = gson.fromJson(responseBody, DailyNewsModel.class);
 
-                mListAdpater.updateList(model);
-
-                mFlowAdapter.updateList(model.getTopStories());
-
-                int newTimeStamp = Integer.valueOf(model.getNewsList().get(0).getGa_prefix());
-
-                // Add to cache and write to db
-                DataCache.getInstance().addDailyCache(model.getDate(), model);
-
-                if (DataBaseManager.getInstance().checkDataExpire(newTimeStamp)) {
-                    // Write to db
-                    Intent intent = new Intent(getActivity(), DataService.class);
-                    intent.putExtra(Constants.INTENT_CACHE_ID, model.getDate());
-                    intent.putExtra(Constants.INTENT_ACTION_TYPE, Constants.ACTION_WRITE_DAILY_NEWS);
-                    getActivity().startService(intent);
-
-                    // update timestamp
-                    DataBaseManager.getInstance().setDataTimeStamp(newTimeStamp);
-                }
+                updateNewsList(model);
 
             }
 
@@ -227,7 +210,14 @@ public class NewsListFragment extends Fragment implements SwipeRefreshLayout.OnR
                 Gson gson = new Gson();
                 DailyNewsModel model = gson.fromJson(responseBody, DailyNewsModel.class);
 
+                // Add date to each news model
                 updateNewsList(model);
+                int newTimeStamp = Integer.valueOf(model.getNewsList().get(0).getGa_prefix());
+                // Add to cache and write to db
+                // Write to db
+                //intent.putExtra(Constants.INTENT_ACTION_TYPE, Constants.ACTION_WRITE_DAILY_NEWS);
+                // update timestamp
+                DataBaseManager.getInstance().setDataTimeStamp(newTimeStamp);
 
             }
 
@@ -305,8 +295,8 @@ public class NewsListFragment extends Fragment implements SwipeRefreshLayout.OnR
         @Override
         public void onReceive(Context context, Intent intent) {
             // TODO Auto-generated method stub
-            //            String action = intent.getAction();
-            //            if (Constants.ACTION_NOTIFY_UI.equals(action)) {
+            // String action = intent.getAction();
+            // if (Constants.ACTION_NOTIFY_UI.equals(action)) {
             String date = intent.getStringExtra(Constants.EXTRA_CACHE_KEY);
             DailyNewsModel model = DataCache.getInstance().getDailyNewsModel(date);
 

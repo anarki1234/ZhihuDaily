@@ -157,8 +157,38 @@ public class DataBaseManager {
             ContentValues values = new ContentValues();
             values.put(DataBaseConstants.BODY, model.getBody());
 
-            db.updateWithOnConflict(DataBaseConstants.NEWS_TABLE_NAME, values,
-                    DataBaseConstants.ID + "=" + model.getId(), null, SQLiteDatabase.CONFLICT_REPLACE);
+            String[] whereArgs = { String.valueOf(model.getId()) };
+            db.updateWithOnConflict(DataBaseConstants.NEWS_TABLE_NAME, values, DataBaseConstants.ID + "=?", whereArgs,
+                    SQLiteDatabase.CONFLICT_REPLACE);
+            db.setTransactionSuccessful();
+        } catch (Exception e) {
+            // TODO: handle exception
+        } finally {
+            db.endTransaction();
+        }
+        return count;
+    }
+
+    public int updateNewsBodyToDB(int id, String body) {
+        Log.d(TAG, "==updateNewsBodyToDB");
+        int count = 0;
+        if (id == -1 || body == null) {
+            return 0;
+        }
+
+        if (!db.isOpen()) {
+            db = mHelper.getReadableDatabase();
+        }
+
+        db.beginTransaction();
+        try {
+            ContentValues values = new ContentValues();
+            values.put(DataBaseConstants.BODY, body);
+            Log.d(TAG, "==body=" + body);
+            String[] whereArgs = { String.valueOf(id) };
+            count = db.updateWithOnConflict(DataBaseConstants.NEWS_TABLE_NAME, values, DataBaseConstants.ID + "=?",
+                    whereArgs, SQLiteDatabase.CONFLICT_REPLACE);
+            db.setTransactionSuccessful();
         } catch (Exception e) {
             // TODO: handle exception
         } finally {
@@ -189,10 +219,10 @@ public class DataBaseManager {
             while (cursor.moveToNext()) {
                 NewsModel model = new NewsModel();
                 model.setId(cursor.getInt(cursor.getColumnIndexOrThrow(DataBaseConstants.ID)));
-                //                Log.d(TAG, "==id=" + model.getId());
+                // Log.d(TAG, "==id=" + model.getId());
                 model.setDate(cursor.getString(cursor.getColumnIndexOrThrow(DataBaseConstants.DATE)));
                 model.setGa_prefix(cursor.getString(cursor.getColumnIndexOrThrow(DataBaseConstants.GA_PREFIX)));
-                //                Log.d(TAG, "==ga_prefix=" + model.getGa_prefix());
+                // Log.d(TAG, "==ga_prefix=" + model.getGa_prefix());
                 model.setIs_top_story(cursor.getInt(cursor.getColumnIndexOrThrow(DataBaseConstants.IS_TOP_STORY)));
                 model.setTitle(cursor.getString(cursor.getColumnIndexOrThrow(DataBaseConstants.TITLE)));
                 model.setUrl(cursor.getString(cursor.getColumnIndexOrThrow(DataBaseConstants.URL)));
@@ -237,7 +267,7 @@ public class DataBaseManager {
 
         String[] columns = { DataBaseConstants.ID, DataBaseConstants.BODY };
         String selection = "id=?";
-        String[] selectionArgs = { id + "" };
+        String[] selectionArgs = { String.valueOf(id) };
         Cursor cursor = db
                 .query(DataBaseConstants.NEWS_TABLE_NAME, columns, selection, selectionArgs, null, null, null);
         if (cursor != null && cursor.getCount() > 0 && cursor.moveToFirst()) {

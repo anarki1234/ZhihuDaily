@@ -53,12 +53,12 @@ public class DataService extends IntentService {
             break;
         case Constants.ACTION_WRITE_NEWS_DEATIL:
             int id = intent.getIntExtra(Constants.INTENT_NEWS_ID, -1);
-            if (id == -1) {
+            String body = intent.getStringExtra(Constants.INTENT_NEWS_BODY);
+            if (id == -1 || body == null) {
                 break;
             }
 
-            NewsModel newsModel = DataCache.getInstance().getNewsCache(id);
-            DataBaseManager.getInstance().writeNewsToDB(newsModel);
+            DataBaseManager.getInstance().updateNewsBodyToDB(id, body);
             break;
         case Constants.ACTION_READ_DAILY_NEWS:
             String date = intent.getStringExtra(Constants.INTENT_NEWS_DATE);
@@ -79,10 +79,10 @@ public class DataService extends IntentService {
             if (news_date == null || news_id == -1) {
                 break;
             }
-            String body = DataBaseManager.getInstance().readNewsBody(news_id);
-            if (body != null) {
+            String news_body = DataBaseManager.getInstance().readNewsBody(news_id);
+            if (news_body != null) {
                 // Update to cache
-                DataCache.getInstance().updateNewsBodyByID(news_date, news_id, body);
+                DataCache.getInstance().updateNewsBodyByID(news_date, news_id, news_body);
 
                 // Notify ui to update
                 mBroadcastNotifier.notifyNewsBodyDataReady(news_date, news_id);
@@ -100,6 +100,7 @@ public class DataService extends IntentService {
             int id2 = intent.getIntExtra(Constants.INTENT_NEWS_ID, -1);
             requestNewsDetail(date2, id2);
             break;
+
         default:
             break;
         }
