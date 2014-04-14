@@ -68,11 +68,13 @@ public class DataBaseManager {
      * @param timestamp
      * @return
      */
-    public boolean checkDataExpire(int timestamp) {
+    public int checkDataExpire(int timestamp) {
         if (timestamp > DataBaseConstants.TIME_STAMP_ID) {
-            return true;
+            return 1;
+        } else if (timestamp == DataBaseConstants.TIME_STAMP_ID) {
+            return 0;
         } else {
-            return false;
+            return -1;
         }
     }
 

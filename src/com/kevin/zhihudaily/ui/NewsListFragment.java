@@ -1,6 +1,7 @@
 package com.kevin.zhihudaily.ui;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
@@ -14,7 +15,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -51,6 +51,14 @@ public class NewsListFragment extends Fragment implements SwipeRefreshLayout.OnR
 
     private HeaderViewFlow mViewFlow;
 
+    // 菜单底部自动加载条
+    private View mFooterView = null;
+
+    /**
+     * 是否重置ListView数据
+     */
+    private boolean mIsResetList = false;
+
     private CircleFlowIndicator mIndicator;
 
     private TopStoryAdapter mFlowAdapter;
@@ -61,6 +69,8 @@ public class NewsListFragment extends Fragment implements SwipeRefreshLayout.OnR
 
     private Date mTodayDate;
     private String mTodayDateString;
+    private Date mIndexDate;
+    private int preDays = 1;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -121,6 +131,9 @@ public class NewsListFragment extends Fragment implements SwipeRefreshLayout.OnR
         mListView.addHeaderView(mHeaderView);
         mListView.setOnScrollListener(mOnScrollListener);
 
+        mFooterView = getActivity().getLayoutInflater().inflate(R.layout.list_footer, null);
+        mFooterView.setVisibility(View.GONE);
+
         mListAdpater = new NewsListAdapter(getActivity());
         mListView.setAdapter(mListAdpater);
         mViewFlow.setListView(mListView);
@@ -129,20 +142,18 @@ public class NewsListFragment extends Fragment implements SwipeRefreshLayout.OnR
         // request latest news
         SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd", Locale.CHINA);
         String todayDate = formatter.format(mTodayDate);
+        mIndexDate = mTodayDate;
         mTodayDateString = todayDate;
         updateNewsList(todayDate);
     }
 
     private void updateNewsList(String date) {
-        //        ZhihuRequest.getRequestService();
         if (ZhihuDailyApplication.sIsConnected) {
             if (mTodayDateString.equals(date)) {
-                //                requestLatestNews();
                 Intent intent = new Intent(getActivity(), DataService.class);
                 intent.putExtra(Constants.INTENT_ACTION_TYPE, Constants.ACTION_GET_TODAY_NEWS);
                 getActivity().startService(intent);
             } else {
-                //requestDailyNewsByDate(date);
                 Intent intent = new Intent(getActivity(), DataService.class);
                 intent.putExtra(Constants.INTENT_ACTION_TYPE, Constants.ACTION_GET_DAILY_NEWS);
                 intent.putExtra(Constants.INTENT_NEWS_DATE, date);
@@ -182,12 +193,14 @@ public class NewsListFragment extends Fragment implements SwipeRefreshLayout.OnR
     @Override
     public void onRefresh() {
         // TODO Auto-generated method stub
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                mSwipeRefreshLayout.setRefreshing(false);
-            }
-        }, 3000);
+        //        new Handler().postDelayed(new Runnable() {
+        //            @Override
+        //            public void run() {
+        //                mSwipeRefreshLayout.setRefreshing(false);
+        //            }
+        //        }, 3000);
+        mIsResetList = true;
+        updateNewsList(mTodayDateString);
     }
 
     private OnScrollListener mOnScrollListener = new OnScrollListener() {
@@ -195,7 +208,25 @@ public class NewsListFragment extends Fragment implements SwipeRefreshLayout.OnR
         @Override
         public void onScrollStateChanged(AbsListView view, int scrollState) {
             // TODO Auto-generated method stub
+            //当不滚动时
+            if (scrollState == AbsListView.OnScrollListener.SCROLL_STATE_IDLE) {
 
+                //判断滚动到底部
+                if (view.getLastVisiblePosition() == (view.getCount() - 1)) {
+                    //                    if (!mOrderInfoModel.isLoadComplete() && !mController.isLoadingNow()) {
+                    // 滑动到底部
+                    mFooterView.setVisibility(View.VISIBLE);
+                    mListView.setSelection(view.getCount() - 1);
+                    // 发起数据请求
+                    Calendar calendar = Calendar.getInstance();
+                    calendar.add(Calendar.DATE, 0 - preDays);
+                    SimpleDateFormat sf = new SimpleDateFormat("yyyyMMdd");
+                    String str = sf.format(calendar.getTime());
+                    updateNewsList(str);
+                    preDays++;
+                    //                    }
+                }
+            }
         }
 
         @Override
@@ -234,43 +265,55 @@ public class NewsListFragment extends Fragment implements SwipeRefreshLayout.OnR
         public void onReceive(Context context, Intent intent) {
             // TODO Auto-generated method stub
             // String action = intent.getAction();
-            // if (Constants.ACTION_NOTIFY_UI.equals(action)) {
             String date = intent.getStringExtra(Constants.EXTRA_CACHE_KEY);
             DailyNewsModel model = DataCache.getInstance().getDailyNewsModel(date);
 
             updateNewsList(model);
 
-            //            }
         }
 
     }
 
     private void updateNewsList(DailyNewsModel model) {
 
+        // Set SwipeRefreshLayout to stop
+        mSwipeRefreshLayout.setRefreshing(false);
+
+        // Hide Loading footer view
+        mFooterView.setVisibility(View.GONE);
+
         // Add date to each news model
         String date = model.getDate();
         for (NewsModel news : model.getNewsList()) {
             news.setDate(date);
         }
+        if (mIsResetList) {
+            ArrayList<DailyNewsModel> list = new ArrayList<DailyNewsModel>();
+            list.add(model);
+            mListAdpater.updateAllList(list);
 
-        mListAdpater.updateList(model);
+            ArrayList<NewsModel> newslist = new ArrayList<NewsModel>();
+            newslist.addAll(model.getTopStories());
+            mFlowAdapter.updateAllList(newslist);
 
-        mFlowAdapter.updateList(model.getTopStories());
+            mIsResetList = false;
+        } else {
+            mListAdpater.updateList(model);
+
+            mFlowAdapter.updateList(model.getTopStories());
+        }
 
         int newTimeStamp = Integer.valueOf(model.getNewsList().get(0).getGa_prefix());
 
         //        // Add to cache and write to db
         //        DataCache.getInstance().addDailyCache(model.getDate(), model);
 
-        if (DataBaseManager.getInstance().checkDataExpire(newTimeStamp)) {
+        if (DataBaseManager.getInstance().checkDataExpire(newTimeStamp) >= 0) {
             // Write to db
             Intent intent = new Intent(getActivity(), DataService.class);
             intent.putExtra(Constants.INTENT_CACHE_ID, model.getDate());
             intent.putExtra(Constants.INTENT_ACTION_TYPE, Constants.ACTION_WRITE_DAILY_NEWS);
             getActivity().startService(intent);
-
-            // update timestamp
-            DataBaseManager.getInstance().setDataTimeStamp(newTimeStamp);
         }
     }
 }

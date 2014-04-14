@@ -114,10 +114,21 @@ public class DataService extends IntentService {
         //        Log.d(TAG, "==OUT=" + SystemClock.currentThreadTimeMillis());
 
         if (model != null) {
-            DataCache.getInstance().addDailyCache(model.getDate(), model);
+            int newTimeStamp = Integer.valueOf(model.getNewsList().get(0).getGa_prefix());
 
-            // notify ui to update
-            mBroadcastNotifier.notifyDailyNewsDataReady(model.getDate());
+            int dataStatus = DataBaseManager.getInstance().checkDataExpire(newTimeStamp);
+            if (dataStatus >= 0) {
+                if (dataStatus > 0) {
+                    // update timestamp
+                    DataBaseManager.getInstance().setDataTimeStamp(newTimeStamp);
+                }
+
+                DataCache.getInstance().addDailyCache(model.getDate(), model);
+
+                // notify ui to update
+                mBroadcastNotifier.notifyDailyNewsDataReady(model.getDate());
+            }
+
         }
     }
 
