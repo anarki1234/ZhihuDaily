@@ -70,7 +70,7 @@ public class NewsListFragment extends Fragment implements SwipeRefreshLayout.OnR
     private Date mTodayDate;
     private String mTodayDateString;
     private Date mIndexDate;
-    private int preDays = 1;
+    private int preDays = 0;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -144,12 +144,12 @@ public class NewsListFragment extends Fragment implements SwipeRefreshLayout.OnR
         String todayDate = formatter.format(mTodayDate);
         mIndexDate = mTodayDate;
         mTodayDateString = todayDate;
-        updateNewsList(todayDate);
+        updateNewsList(todayDate, true);
     }
 
-    private void updateNewsList(String date) {
+    private void updateNewsList(String date, boolean isToday) {
         if (ZhihuDailyApplication.sIsConnected) {
-            if (mTodayDateString.equals(date)) {
+            if (isToday) {
                 Intent intent = new Intent(getActivity(), DataService.class);
                 intent.putExtra(Constants.INTENT_ACTION_TYPE, Constants.ACTION_GET_TODAY_NEWS);
                 getActivity().startService(intent);
@@ -200,7 +200,7 @@ public class NewsListFragment extends Fragment implements SwipeRefreshLayout.OnR
         //            }
         //        }, 3000);
         mIsResetList = true;
-        updateNewsList(mTodayDateString);
+        updateNewsList(mTodayDateString, true);
     }
 
     private OnScrollListener mOnScrollListener = new OnScrollListener() {
@@ -222,7 +222,8 @@ public class NewsListFragment extends Fragment implements SwipeRefreshLayout.OnR
                     calendar.add(Calendar.DATE, 0 - preDays);
                     SimpleDateFormat sf = new SimpleDateFormat("yyyyMMdd");
                     String str = sf.format(calendar.getTime());
-                    updateNewsList(str);
+                    Log.d(TAG, "==preDate==" + str);
+                    updateNewsList(str, false);
                     preDays++;
                     //                    }
                 }
