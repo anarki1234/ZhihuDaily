@@ -12,6 +12,7 @@ public class Constants {
     public static final int ACTION_GET_TODAY_NEWS = 0x05;
     public static final int ACTION_GET_DAILY_NEWS = 0x06;
     public static final int ACTION_GET_NEWS_DETAIL = 0x07;
+    public static final int ACTION_START_OFFLINE_DOWNLOAD = 0x08;
 
     public static final String INTENT_NEWS_NUM = "news_num";
     public static final String INTENT_NEWS_INDEX = "news_index";
@@ -35,5 +36,8 @@ public class Constants {
     public static final String ACTION_NOTIFY_NEWS_DETAIL_READY = "com.kevin.zhihudaily.NOTIFY_NEWS_DETAIL_READY";
 
     public static final String EXTRA_CACHE_KEY = "com.kevin.zhihudaily.CACHE_KEY";
+
+    public static final String EXTRA_PROGRESS_MAX = "com.kevin.zhihudaily.PROGRESS_MAX";
+    public static final String EXTRA_PROGRESS_PROGRESS = "com.kevin.zhihudaily.PROGRESS_INCR";
 
 }

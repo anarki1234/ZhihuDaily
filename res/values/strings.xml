@@ -16,4 +16,7 @@
     <string name="no_network_connection_toast">No network connection found</string>
     
     <string name="loading">Loading...</string>
+    <string name="data_cache">Data Cache</string>
+    <string name="data_cache_inprocess">Downloading...</string>
+    <string name="data_cache_complete">Downloading Completed</string>
 </resources>

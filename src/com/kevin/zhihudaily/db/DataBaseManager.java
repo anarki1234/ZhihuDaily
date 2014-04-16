@@ -186,12 +186,13 @@ public class DataBaseManager {
         try {
             ContentValues values = new ContentValues();
             values.put(DataBaseConstants.BODY, body);
-            Log.d(TAG, "==body=" + body);
-            //            String[] whereArgs = { String.valueOf(id) };
-            //            count = db.updateWithOnConflict(DataBaseConstants.NEWS_TABLE_NAME, values, DataBaseConstants.ID + "=?",
-            //                    whereArgs, SQLiteDatabase.CONFLICT_REPLACE);
-            db.updateWithOnConflict(DataBaseConstants.NEWS_TABLE_NAME, values, DataBaseConstants.ID + "=" + id, null,
-                    SQLiteDatabase.CONFLICT_REPLACE);
+            String[] whereArgs = { String.valueOf(id) };
+            //            Log.d(TAG, "==body=" + body);
+            count = db.updateWithOnConflict(DataBaseConstants.NEWS_TABLE_NAME, values, DataBaseConstants.ID + "=?",
+                    whereArgs, SQLiteDatabase.CONFLICT_REPLACE);
+            Log.d(TAG, "==count==" + count);
+            //            db.updateWithOnConflict(DataBaseConstants.NEWS_TABLE_NAME, values, DataBaseConstants.ID + "=" + id, null,
+            //                    SQLiteDatabase.CONFLICT_REPLACE);
 
             db.setTransactionSuccessful();
         } catch (Exception e) {

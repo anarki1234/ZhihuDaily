@@ -69,28 +69,26 @@ public class BroadcastNotifier {
     }
 
     /**
-     * Uses LocalBroadcastManager to send an {@link String} containing a logcat
-     * message. {@link Intent} has the action {@code BROADCAST_ACTION} and the
-     * category {@code DEFAULT}.
-     * 
-     * @param logData
-     *            a {@link String} to insert into the log.
-     */
-    public void notifyProgress(String logData) {
+    * Uses LocalBroadcastManager to send an {@link String} containing a logcat
+    * message. {@link Intent} has the action {@code BROADCAST_ACTION} and the
+    * category {@code DEFAULT}.
+    * 
+    * @param logData
+    *            a {@link String} to insert into the log.
+    */
+    public void notifyProgress(int progress) {
+        Intent localIntent = new Intent();
 
-        // Intent localIntent = new Intent();
-        //
-        // // The Intent contains the custom broadcast action for this app
-        // localIntent.setAction(Constants.BROADCAST_ACTION);
-        //
-        // localIntent.putExtra(Constants.EXTENDED_DATA_STATUS, -1);
-        //
-        // // Puts log data into the Intent
-        // localIntent.putExtra(Constants.EXTENDED_STATUS_LOG, logData);
-        // localIntent.addCategory(Intent.CATEGORY_DEFAULT);
-        //
-        // // Broadcasts the Intent
-        // mBroadcaster.sendBroadcast(localIntent);
+        // The Intent contains the custom broadcast action for this app
+        localIntent.setAction(Constants.ACTION_NOTIFY_DAILY_NEWS_READY);
+
+        // Puts data into the Intent
+        localIntent.putExtra(Constants.INTENT_ACTION_TYPE, Constants.ACTION_START_OFFLINE_DOWNLOAD);
+        localIntent.putExtra(Constants.EXTRA_PROGRESS_PROGRESS, progress);
+        localIntent.addCategory(Intent.CATEGORY_DEFAULT);
+
+        // Broadcasts the Intent
+        mBroadcaster.sendBroadcast(localIntent);
 
     }
 

@@ -1,5 +1,11 @@
 package com.kevin.zhihudaily.db;
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
+
 import android.app.IntentService;
 import android.content.Intent;
 import android.util.Log;
@@ -100,7 +106,10 @@ public class DataService extends IntentService {
             int id2 = intent.getIntExtra(Constants.INTENT_NEWS_ID, -1);
             requestNewsDetail(date2, id2);
             break;
-
+        case Constants.ACTION_START_OFFLINE_DOWNLOAD:
+            String date3 = intent.getStringExtra(Constants.INTENT_NEWS_DATE);
+            startOfflineDownload(date3);
+            break;
         default:
             break;
         }
@@ -150,6 +159,45 @@ public class DataService extends IntentService {
 
             // Notify ui to update
             mBroadcastNotifier.notifyNewsBodyDataReady(date, id);
+        }
+    }
+
+    private void startOfflineDownload(String date) {
+        Calendar calendar = Calendar.getInstance();
+        Date todayDate = calendar.getTime();
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd", Locale.CHINA);
+        String todayDateString = formatter.format(todayDate);
+
+        DailyNewsModel model;
+        if (todayDateString.equals(date)) {
+            model = ZhihuRequest.getRequestService().getDailyNewsToday();
+        } else {
+            model = ZhihuRequest.getRequestService().getDailyNewsByDate(date);
+
+        }
+        if (model != null) {
+            DataBaseManager.getInstance().writeDailyNewsToDB(model);
+
+            ArrayList<NewsModel> list = (ArrayList<NewsModel>) model.getNewsList();
+            int size = list.size();
+            if (size > 0) {
+                int incr = 100 / size;
+                int progress = 0;
+                for (NewsModel news : list) {
+                    news = ZhihuRequest.getRequestService().getNewsById(news.getId());
+                    if (news != null) {
+                        DataBaseManager.getInstance().updateNewsBodyToDB(news.getId(), news.getBody());
+                    }
+
+                    // notify ui to update
+                    progress += incr;
+                    mBroadcastNotifier.notifyProgress(progress);
+
+                }
+
+                // notify ui to update
+                mBroadcastNotifier.notifyProgress(100);
+            }
         }
     }
 

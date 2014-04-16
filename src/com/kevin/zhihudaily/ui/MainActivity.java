@@ -114,6 +114,7 @@ public class MainActivity extends ActionBarActivity {
             } else {
                 ZhihuDailyApplication.sIsConnected = false;
             }
+            ZhihuDailyApplication.sNetworkType = networkInfo.getType();
         }
 
         //        // init database

@@ -9,13 +9,17 @@ import java.util.Locale;
 import org.taptwo.android.widget.CircleFlowIndicator;
 
 import android.annotation.TargetApi;
+import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.net.ConnectivityManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
@@ -72,6 +76,10 @@ public class NewsListFragment extends Fragment implements SwipeRefreshLayout.OnR
     private Date mIndexDate;
     private int preDays = 0;
 
+    NotificationCompat.Builder mNotifyBuilder;
+    NotificationManager mNotificationManager;
+    private int mNotifyID = 0x0007;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // TODO Auto-generated method stub
@@ -107,6 +115,11 @@ public class NewsListFragment extends Fragment implements SwipeRefreshLayout.OnR
 
         Calendar calendar = Calendar.getInstance();
         mTodayDate = calendar.getTime();
+
+        mNotificationManager = (NotificationManager) getActivity().getSystemService(Context.NOTIFICATION_SERVICE);
+        mNotifyBuilder = new NotificationCompat.Builder(getActivity()).setSmallIcon(R.drawable.push_icon)
+                .setContentTitle(getString(R.string.data_cache))
+                .setContentText(getString(R.string.data_cache_inprocess)).setAutoCancel(true);
 
         mDataReadyReceiver = new DataReadyReceiver();
         IntentFilter dataIntentFilter = new IntentFilter(Constants.ACTION_NOTIFY_DAILY_NEWS_READY);
@@ -159,10 +172,16 @@ public class NewsListFragment extends Fragment implements SwipeRefreshLayout.OnR
                 intent.putExtra(Constants.INTENT_NEWS_DATE, date);
                 getActivity().startService(intent);
             }
+
+            // Auto start data cache
+            if (ZhihuDailyApplication.sNetworkType == ConnectivityManager.TYPE_WIFI) {
+                startDataCache(date);
+            }
         } else {
             Log.e(TAG, "==DB-Mode==" + date);
             readLastestNewsFromDB(date);
         }
+
     }
 
     private void readLastestNewsFromDB(String date) {
@@ -266,10 +285,17 @@ public class NewsListFragment extends Fragment implements SwipeRefreshLayout.OnR
         public void onReceive(Context context, Intent intent) {
             // TODO Auto-generated method stub
             // String action = intent.getAction();
-            String date = intent.getStringExtra(Constants.EXTRA_CACHE_KEY);
-            DailyNewsModel model = DataCache.getInstance().getDailyNewsModel(date);
+            int action_type = intent.getIntExtra(Constants.INTENT_ACTION_TYPE, -1);
+            if (action_type != Constants.ACTION_START_OFFLINE_DOWNLOAD) {
+                String date = intent.getStringExtra(Constants.EXTRA_CACHE_KEY);
+                DailyNewsModel model = DataCache.getInstance().getDailyNewsModel(date);
 
-            updateNewsList(model);
+                updateNewsList(model);
+
+            } else {
+                int progress = intent.getIntExtra(Constants.EXTRA_PROGRESS_PROGRESS, -1);
+                updateNotification(progress);
+            }
 
         }
 
@@ -316,5 +342,39 @@ public class NewsListFragment extends Fragment implements SwipeRefreshLayout.OnR
             intent.putExtra(Constants.INTENT_ACTION_TYPE, Constants.ACTION_WRITE_DAILY_NEWS);
             getActivity().startService(intent);
         }
+    }
+
+    private void startDataCache(String date) {
+        Intent intent = new Intent(getActivity(), DataService.class);
+        intent.putExtra(Constants.INTENT_ACTION_TYPE, Constants.ACTION_START_OFFLINE_DOWNLOAD);
+        intent.putExtra(Constants.INTENT_NEWS_DATE, date);
+        getActivity().startService(intent);
+
+        // Show notification
+        showNotification();
+    }
+
+    private void showNotification() {
+        mNotifyBuilder.setProgress(100, 0, false);
+        mNotificationManager.notify(mNotifyID, mNotifyBuilder.build());
+    }
+
+    private void updateNotification(int progress) {
+        if (progress >= 100) {
+            progress = 100;
+            mNotifyBuilder.setContentText(getString(R.string.data_cache_complete));
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    clearNotification();
+                }
+            }, 5000);
+        }
+        mNotifyBuilder.setProgress(100, progress, false);
+        mNotificationManager.notify(mNotifyID, mNotifyBuilder.build());
+    }
+
+    private void clearNotification() {
+        mNotificationManager.cancel(mNotifyID);
     }
 }
