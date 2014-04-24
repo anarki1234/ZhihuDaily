@@ -18,6 +18,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -40,10 +41,12 @@ public class MainActivity extends ActionBarActivity {
     private CharSequence mDrawerTitle;
     private CharSequence mTitle;
     private String[] mMenuTitles;
+    private String TAG = "MainActivity";
 
     @SuppressLint("NewApi")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.d(TAG, "==onCreate==");
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
         setContentView(R.layout.activity_main);
@@ -124,10 +127,12 @@ public class MainActivity extends ActionBarActivity {
 
     @Override
     protected void onDestroy() {
+        Log.d(TAG, "==onDestroy==");
         // TODO Auto-generated method stub
         //        DataBaseManager.getInstance().closeDB();
         //        DataCache.getInstance().clearAllCache();
         super.onDestroy();
+
     }
 
     @Override

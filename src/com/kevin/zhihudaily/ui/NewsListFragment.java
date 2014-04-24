@@ -52,7 +52,6 @@ public class NewsListFragment extends Fragment implements SwipeRefreshLayout.OnR
     private NewsListAdapter mListAdpater;
 
     private View mHeaderView;
-
     private HeaderViewFlow mViewFlow;
 
     // 菜单底部自动加载条
@@ -83,6 +82,7 @@ public class NewsListFragment extends Fragment implements SwipeRefreshLayout.OnR
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // TODO Auto-generated method stub
+        Log.d(TAG, "==onCreateViewonCreateView==");
         mRootView = inflater.inflate(R.layout.fragment_news_list, container, false);
         return mRootView;
         // return super.onCreateView(inflater, container, savedInstanceState);
@@ -91,6 +91,7 @@ public class NewsListFragment extends Fragment implements SwipeRefreshLayout.OnR
     @Override
     public void onDestroyView() {
         // TODO Auto-generated method stub
+        Log.d(TAG, "==onDestroyView==");
         super.onDestroyView();
 
         mRootView = null;
