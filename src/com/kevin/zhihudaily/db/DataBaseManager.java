@@ -88,14 +88,14 @@ public class DataBaseManager {
     }
 
     public int writeDailyNewsToDB(DailyNewsModel dailyNewsModel) {
-        Log.d(TAG, "==writeDailyNewsToDB");
+        Log.d(TAG, "==writeDailyNewsToDB==START");
         int count = 0;
         if (dailyNewsModel == null) {
             return 0;
         }
 
         if (!db.isOpen()) {
-            db = mHelper.getReadableDatabase();
+            db = mHelper.getWritableDatabase();
         }
 
         db.beginTransaction();
@@ -122,8 +122,8 @@ public class DataBaseManager {
                 values.put(DataBaseConstants.GA_PREFIX, model.getGa_prefix());
                 values.put(DataBaseConstants.TITLE, model.getTitle());
                 values.put(DataBaseConstants.URL, model.getUrl());
-                Log.e(TAG, "==Image_source" + model.getImage_source());
-                values.put(DataBaseConstants.IMAGE_SOURCE, model.getImage_source());
+                //                Log.e(TAG, "==Image_source" + model.getImage_source());
+                //                values.put(DataBaseConstants.IMAGE_SOURCE, model.getImage_source());
                 values.put(DataBaseConstants.IMAGE_URL, model.getImage());
                 values.put(DataBaseConstants.IMAGE_THUMBNAIL, model.getThumbnail());
                 values.put(DataBaseConstants.SHARE_URL, model.getShare_url());
@@ -140,24 +140,26 @@ public class DataBaseManager {
         } finally {
             db.endTransaction();
         }
+        Log.d(TAG, "==writeDailyNewsToDB==END");
         return count;
     }
 
     public int writeNewsToDB(NewsModel model) {
-        Log.d(TAG, "==writeDailyNewsToDB");
+        Log.d(TAG, "==writeNewsToDB");
         int count = 0;
         if (model == null) {
             return 0;
         }
 
         if (!db.isOpen()) {
-            db = mHelper.getReadableDatabase();
+            db = mHelper.getWritableDatabase();
         }
 
         db.beginTransaction();
         try {
             ContentValues values = new ContentValues();
             values.put(DataBaseConstants.BODY, model.getBody());
+            values.put(DataBaseConstants.IMAGE_SOURCE, model.getImage_source());
 
             String[] whereArgs = { String.valueOf(model.getId()) };
             db.updateWithOnConflict(DataBaseConstants.NEWS_TABLE_NAME, values, DataBaseConstants.ID + "=?", whereArgs,
@@ -171,7 +173,7 @@ public class DataBaseManager {
         return count;
     }
 
-    public int updateNewsBodyToDB(int id, String body) {
+    public int updateNewsBodyToDB(int id, String body, String imageSource) {
         Log.d(TAG, "==updateNewsBodyToDB");
         int count = 0;
         if (id == -1 || body == null) {
@@ -179,27 +181,83 @@ public class DataBaseManager {
         }
 
         if (!db.isOpen()) {
-            db = mHelper.getReadableDatabase();
+            db = mHelper.getWritableDatabase();
         }
+
+        //        ContentValues values = new ContentValues();
+        //        values.put(DataBaseConstants.BODY, body);
+        //        if (imageSource != null) {
+        //            values.put(DataBaseConstants.IMAGE_SOURCE, imageSource);
+        //        }
+        //        String[] whereArgs = { String.valueOf(id) };
+        //        Log.d(TAG, "==imageSource=" + imageSource);
+        //        //        db.update(DataBaseConstants.NEWS_TABLE_NAME, values, "id=?", whereArgs);
+        //        db.execSQL("UPDATE NewsData SET image_source= '2048', body='<div><div>' WHERE id=3867430");
 
         db.beginTransaction();
         try {
             ContentValues values = new ContentValues();
             values.put(DataBaseConstants.BODY, body);
+            if (imageSource != null) {
+                values.put(DataBaseConstants.IMAGE_SOURCE, imageSource);
+            }
             String[] whereArgs = { String.valueOf(id) };
-            //            Log.d(TAG, "==body=" + body);
+            Log.d(TAG, "==imageSource=" + imageSource);
             count = db.updateWithOnConflict(DataBaseConstants.NEWS_TABLE_NAME, values, DataBaseConstants.ID + "=?",
-                    whereArgs, SQLiteDatabase.CONFLICT_REPLACE);
-            Log.d(TAG, "==count==" + count);
-            //            db.updateWithOnConflict(DataBaseConstants.NEWS_TABLE_NAME, values, DataBaseConstants.ID + "=" + id, null,
-            //                    SQLiteDatabase.CONFLICT_REPLACE);
+                    whereArgs, SQLiteDatabase.CONFLICT_IGNORE);
+            //            db.execSQL("UPDATE NewsData SET image_source= '" + imageSource + "', body='" + body + "'" + "WHERE id="
+            //                    + id);
+
+            //            String rawQuery = "UPDATE NewsData SET image_source='2048' WHERE id=" + id;
+            //            db.rawQuery(rawQuery, null);
+            //            db.execSQL("UPDATE NewsData SET image_source= '2048', body='<div><div>' WHERE id=3867430");
 
             db.setTransactionSuccessful();
+            Log.d(TAG, "==count==" + count);
         } catch (Exception e) {
             // TODO: handle exception
+            Log.e(TAG, "==Exception==" + e.toString());
         } finally {
             db.endTransaction();
         }
+        return count;
+    }
+
+    public int updateNewsListToDB(List<NewsModel> list) {
+        Log.d(TAG, "==updateNewsListToDB==START");
+        int count = 0;
+        if (list == null || list.size() <= 0) {
+            return 0;
+        }
+
+        if (!db.isOpen()) {
+            db = mHelper.getWritableDatabase();
+        }
+
+        db.beginTransaction();
+        try {
+            for (NewsModel newsModel : list) {
+                ContentValues values = new ContentValues();
+                values.put(DataBaseConstants.BODY, newsModel.getBody());
+                String imageSource = newsModel.getImage_source();
+                if (imageSource != null) {
+                    values.put(DataBaseConstants.IMAGE_SOURCE, imageSource);
+                }
+                String[] whereArgs = { String.valueOf(newsModel.getId()) };
+                Log.d(TAG, "==imageSource=" + imageSource);
+                count = db.updateWithOnConflict(DataBaseConstants.NEWS_TABLE_NAME, values, DataBaseConstants.ID + "=?",
+                        whereArgs, SQLiteDatabase.CONFLICT_REPLACE);
+            }
+
+            db.setTransactionSuccessful();
+
+        } catch (Exception e) {
+            // TODO: handle exception
+            Log.e(TAG, "==Exception==" + e.toString());
+        } finally {
+            db.endTransaction();
+        }
+        Log.d(TAG, "==updateNewsListToDB==END");
         return count;
     }
 

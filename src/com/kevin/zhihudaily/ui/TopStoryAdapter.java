@@ -60,7 +60,7 @@ public class TopStoryAdapter extends BaseAdapter {
     @Override
     public int getCount() {
         // TODO Auto-generated method stub
-        return mDataList.size() > 3 ? mDataList.size() : 3;
+        return mDataList.size() > 5 ? mDataList.size() : 5;
         //		return mDataList.size();
     }
 

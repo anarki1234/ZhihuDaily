@@ -53,8 +53,8 @@ public class DataService extends IntentService {
                 break;
             }
 
-            DailyNewsModel model = DataCache.getInstance().getDailyNewsModel(key);
-            DataBaseManager.getInstance().writeDailyNewsToDB(model);
+            //            DailyNewsModel model = DataCache.getInstance().getDailyNewsModel(key);
+            //            DataBaseManager.getInstance().writeDailyNewsToDB(model);
 
             break;
         case Constants.ACTION_WRITE_NEWS_DEATIL:
@@ -64,7 +64,7 @@ public class DataService extends IntentService {
                 break;
             }
 
-            DataBaseManager.getInstance().updateNewsBodyToDB(id, body);
+            DataBaseManager.getInstance().updateNewsBodyToDB(id, body, null);
             break;
         case Constants.ACTION_READ_DAILY_NEWS:
             String date = intent.getStringExtra(Constants.INTENT_NEWS_DATE);
@@ -181,19 +181,26 @@ public class DataService extends IntentService {
             ArrayList<NewsModel> list = (ArrayList<NewsModel>) model.getNewsList();
             int size = list.size();
             if (size > 0) {
-                int incr = 100 / size;
+                int incr = 100 / size + 1;
                 int progress = 0;
+                ArrayList<NewsModel> newslist = new ArrayList<NewsModel>();
                 for (NewsModel news : list) {
                     news = ZhihuRequest.getRequestService().getNewsById(news.getId());
-                    if (news != null) {
-                        DataBaseManager.getInstance().updateNewsBodyToDB(news.getId(), news.getBody());
-                    }
+                    newslist.add(news);
+                    //                    if (news != null) {
+                    //                        //                        Log.d(TAG, "==startOfflineDownload  image_source" + news.getImage_source());
+                    //                        DataBaseManager.getInstance().updateNewsBodyToDB(news.getId(), news.getBody(),
+                    //                                news.getImage_source());
+                    //                    }
 
                     // notify ui to update
                     progress += incr;
                     mBroadcastNotifier.notifyProgress(progress);
 
                 }
+
+                // Write to DB
+                DataBaseManager.getInstance().updateNewsListToDB(newslist);
 
                 // notify ui to update
                 mBroadcastNotifier.notifyProgress(100);

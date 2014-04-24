@@ -188,8 +188,11 @@ public class NewsListAdapter extends BaseAdapter implements PinnedSectionListAda
             NewsModel model = item.getModel();
             holder.titleTextView.setText(model.getTitle());
 
-            Picasso.with(mContextWR.get()).load(model.getThumbnail()).placeholder(R.drawable.spinner_76_inner_holo)
-                    .fit().into(holder.imageView);
+            String url = model.getThumbnail();
+            if (url != null && !url.isEmpty()) {
+                Picasso.with(mContextWR.get()).load(url).placeholder(R.drawable.spinner_76_inner_holo).fit()
+                        .into(holder.imageView);
+            }
         } else {
             holder.titleTextView.setText(item.getSection());
         }

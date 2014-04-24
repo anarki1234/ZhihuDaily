@@ -138,8 +138,11 @@ public class NewsDetailFragment extends Fragment implements SwipeRefreshLayout.O
     }
 
     private void setupViews() {
-        Picasso.with(getActivity()).load(mNewsModel.getImage()).placeholder(R.drawable.image_top_default).fit()
-                .centerCrop().into(mImageView);
+        String url = mNewsModel.getImage();
+        if (url != null && !url.isEmpty()) {
+            Picasso.with(getActivity()).load(mNewsModel.getImage()).placeholder(R.drawable.image_top_default).fit()
+                    .centerCrop().into(mImageView);
+        }
 
         mTitleTextView.setText(mNewsModel.getTitle());
         mSourceTextView.setText(mNewsModel.getImage_source());
