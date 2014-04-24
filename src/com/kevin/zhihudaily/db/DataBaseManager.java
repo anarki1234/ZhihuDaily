@@ -184,16 +184,6 @@ public class DataBaseManager {
             db = mHelper.getWritableDatabase();
         }
 
-        //        ContentValues values = new ContentValues();
-        //        values.put(DataBaseConstants.BODY, body);
-        //        if (imageSource != null) {
-        //            values.put(DataBaseConstants.IMAGE_SOURCE, imageSource);
-        //        }
-        //        String[] whereArgs = { String.valueOf(id) };
-        //        Log.d(TAG, "==imageSource=" + imageSource);
-        //        //        db.update(DataBaseConstants.NEWS_TABLE_NAME, values, "id=?", whereArgs);
-        //        db.execSQL("UPDATE NewsData SET image_source= '2048', body='<div><div>' WHERE id=3867430");
-
         db.beginTransaction();
         try {
             ContentValues values = new ContentValues();
@@ -202,18 +192,11 @@ public class DataBaseManager {
                 values.put(DataBaseConstants.IMAGE_SOURCE, imageSource);
             }
             String[] whereArgs = { String.valueOf(id) };
-            Log.d(TAG, "==imageSource=" + imageSource);
+            //            Log.d(TAG, "==imageSource=" + imageSource);
             count = db.updateWithOnConflict(DataBaseConstants.NEWS_TABLE_NAME, values, DataBaseConstants.ID + "=?",
-                    whereArgs, SQLiteDatabase.CONFLICT_IGNORE);
-            //            db.execSQL("UPDATE NewsData SET image_source= '" + imageSource + "', body='" + body + "'" + "WHERE id="
-            //                    + id);
-
-            //            String rawQuery = "UPDATE NewsData SET image_source='2048' WHERE id=" + id;
-            //            db.rawQuery(rawQuery, null);
-            //            db.execSQL("UPDATE NewsData SET image_source= '2048', body='<div><div>' WHERE id=3867430");
+                    whereArgs, SQLiteDatabase.CONFLICT_REPLACE);
 
             db.setTransactionSuccessful();
-            Log.d(TAG, "==count==" + count);
         } catch (Exception e) {
             // TODO: handle exception
             Log.e(TAG, "==Exception==" + e.toString());

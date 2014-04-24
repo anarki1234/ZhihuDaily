@@ -183,15 +183,15 @@ public class DataService extends IntentService {
             if (size > 0) {
                 int incr = 100 / size + 1;
                 int progress = 0;
-                ArrayList<NewsModel> newslist = new ArrayList<NewsModel>();
+                //                ArrayList<NewsModel> newslist = new ArrayList<NewsModel>();
                 for (NewsModel news : list) {
                     news = ZhihuRequest.getRequestService().getNewsById(news.getId());
-                    newslist.add(news);
-                    //                    if (news != null) {
-                    //                        //                        Log.d(TAG, "==startOfflineDownload  image_source" + news.getImage_source());
-                    //                        DataBaseManager.getInstance().updateNewsBodyToDB(news.getId(), news.getBody(),
-                    //                                news.getImage_source());
-                    //                    }
+                    //                    newslist.add(news);
+                    if (news != null) {
+                        //                        Log.d(TAG, "==startOfflineDownload  image_source" + news.getImage_source());
+                        DataBaseManager.getInstance().updateNewsBodyToDB(news.getId(), news.getBody(),
+                                news.getImage_source());
+                    }
 
                     // notify ui to update
                     progress += incr;
@@ -200,7 +200,7 @@ public class DataService extends IntentService {
                 }
 
                 // Write to DB
-                DataBaseManager.getInstance().updateNewsListToDB(newslist);
+                //                DataBaseManager.getInstance().updateNewsListToDB(newslist);
 
                 // notify ui to update
                 mBroadcastNotifier.notifyProgress(100);
