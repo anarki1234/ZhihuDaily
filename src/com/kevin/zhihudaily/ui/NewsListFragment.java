@@ -159,6 +159,16 @@ public class NewsListFragment extends Fragment implements SwipeRefreshLayout.OnR
         mIndexDate = mTodayDate;
         mTodayDateString = todayDate;
         updateNewsList(todayDate, true);
+
+        // Auto start data cache
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (ZhihuDailyApplication.sNetworkType == ConnectivityManager.TYPE_WIFI) {
+                    startDataCache(mTodayDateString);
+                }
+            }
+        }, 2000);
     }
 
     private void updateNewsList(String date, boolean isToday) {
@@ -174,10 +184,6 @@ public class NewsListFragment extends Fragment implements SwipeRefreshLayout.OnR
                 getActivity().startService(intent);
             }
 
-            // Auto start data cache
-            if (ZhihuDailyApplication.sNetworkType == ConnectivityManager.TYPE_WIFI) {
-                startDataCache(date);
-            }
         } else {
             Log.e(TAG, "==DB-Mode==" + date);
             readLastestNewsFromDB(date);
@@ -271,8 +277,10 @@ public class NewsListFragment extends Fragment implements SwipeRefreshLayout.OnR
 
             } else {
                 newAlpha = 255;
+                //                ((MainActivity) getActivity()).setActionBarAlpha(newAlpha);
+                ((MainActivity) getActivity()).setActionBarAlpha(0);
             }
-            ((MainActivity) getActivity()).setActionBarAlpha(newAlpha);
+
         }
 
     };

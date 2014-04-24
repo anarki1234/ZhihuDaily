@@ -7,9 +7,9 @@
     
     <TextView 
         android:id="@+id/tv_section_title"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="?android:attr/actionBarSize"
-        android:paddingLeft="15dp"
+        android:paddingLeft="43dp"
         android:paddingRight="9dp"
         android:paddingTop="9dp"
         android:paddingBottom="9dp"

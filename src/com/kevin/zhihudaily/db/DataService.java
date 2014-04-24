@@ -176,6 +176,12 @@ public class DataService extends IntentService {
 
         }
         if (model != null) {
+
+            int newTimeStamp = Integer.valueOf(model.getNewsList().get(0).getGa_prefix());
+            if (DataBaseManager.getInstance().checkDataExpire(newTimeStamp) >= 0) {
+
+            }
+
             DataBaseManager.getInstance().writeDailyNewsToDB(model);
 
             ArrayList<NewsModel> list = (ArrayList<NewsModel>) model.getNewsList();
