@@ -63,7 +63,7 @@ public class DataBaseManager {
     }
 
     /**
-     * 判断本地数据是否过期，返回true表示已过期需要更新，反之返回false
+     * Check data expire
      * 
      * @param timestamp
      * @return
