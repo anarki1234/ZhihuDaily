@@ -119,7 +119,7 @@ public class DataService extends IntentService {
     private void requestTodayNews() {
         //        Log.d(TAG, "==IN=" + SystemClock.currentThreadTimeMillis());
         DailyNewsModel model = ZhihuRequest.getRequestService().getDailyNewsToday();
-        Log.d(TAG, "==Model=" + model.getDisplay_date());
+        //        Log.d(TAG, "==Model=" + model.getDisplay_date());
         //        Log.d(TAG, "==OUT=" + SystemClock.currentThreadTimeMillis());
 
         if (model != null) {
@@ -153,7 +153,7 @@ public class DataService extends IntentService {
 
     private void requestNewsDetail(String date, int id) {
         NewsModel model = ZhihuRequest.getRequestService().getNewsById(id);
-        Log.d(TAG, "==ModelBody=" + model.getBody());
+        //        Log.d(TAG, "==ModelBody=" + model.getBody());
         if (model != null) {
             DataCache.getInstance().updateNewsBodyByID(date, id, model.getBody());
 

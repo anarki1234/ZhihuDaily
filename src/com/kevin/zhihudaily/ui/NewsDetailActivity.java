@@ -1,5 +1,8 @@
 package com.kevin.zhihudaily.ui;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.Intent;
@@ -12,7 +15,6 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
@@ -65,6 +67,7 @@ public class NewsDetailActivity extends ActionBarActivity implements OnClickList
 
         // Read from cache for viewpager data
         DailyNewsModel dailyNewsModel = DataCache.getInstance().getDailyNewsModel(dateKey);
+        mNewsNum = dailyNewsModel.getNewsList().size();
 
         // Set up ViewPager and backing adapter
         mAdapter = new DetailPagerAdapter(getSupportFragmentManager(), mNewsNum, dailyNewsModel);
@@ -81,6 +84,7 @@ public class NewsDetailActivity extends ActionBarActivity implements OnClickList
         // immersive photo viewing experience
 
         // Hide title text and set home as up
+        getActionBar().setIcon(R.drawable.topbar_icon);
         getActionBar().setDisplayShowTitleEnabled(false);
         getActionBar().setDisplayHomeAsUpEnabled(true);
         getActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#33000000")));
@@ -102,11 +106,29 @@ public class NewsDetailActivity extends ActionBarActivity implements OnClickList
         //        getActionBar().hide();
 
         // Set the current item based on the extra passed in to this activity
-        final int extraCurrentItem = getIntent().getIntExtra(Constants.INTENT_NEWS_INDEX, -1);
-        Log.e(TAG, "==pageindex==" + extraCurrentItem);
+        int extraCurrentItem = getIntent().getIntExtra(Constants.INTENT_NEWS_INDEX, -1);
+        //        Log.e(TAG, "==pageindex==" + extraCurrentItem);
         if (extraCurrentItem != -1) {
             mPager.setCurrentItem(extraCurrentItem);
+        } else {
+            ArrayList<NewsModel> list = (ArrayList<NewsModel>) dailyNewsModel.getNewsList();
+            extraCurrentItem = getIndexById(list, mSelectModel.getId());
+            //            Log.e(TAG, "==pageindex_new==" + extraCurrentItem);
+            if (extraCurrentItem != -1) {
+                mPager.setCurrentItem(extraCurrentItem);
+            }
         }
+    }
+
+    private int getIndexById(List<NewsModel> list, int id) {
+        int index = -1;
+        for (int i = 0; i < list.size(); i++) {
+            if (list.get(i).getId() == id) {
+                index = i;
+                return index;
+            }
+        }
+        return index;
     }
 
     @Override

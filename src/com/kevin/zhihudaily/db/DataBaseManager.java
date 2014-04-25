@@ -174,7 +174,7 @@ public class DataBaseManager {
     }
 
     public int updateNewsBodyToDB(int id, String body, String imageSource) {
-        Log.d(TAG, "==updateNewsBodyToDB");
+        //        Log.d(TAG, "==updateNewsBodyToDB");
         int count = 0;
         if (id == -1 || body == null) {
             return 0;

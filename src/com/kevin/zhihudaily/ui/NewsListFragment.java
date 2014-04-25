@@ -29,6 +29,7 @@ import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 
 import com.kevin.zhihudaily.Constants;
@@ -137,6 +138,14 @@ public class NewsListFragment extends Fragment implements SwipeRefreshLayout.OnR
         mFlowAdapter = new TopStoryAdapter(getActivity());
         mViewFlow = (HeaderViewFlow) mHeaderView.findViewById(R.id.viewflow);
         mViewFlow.setAdapter(mFlowAdapter);
+        mViewFlow.setOnItemClickListener(new OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
+                // TODO Auto-generated method stub
+                Log.e(TAG, "==OnItemClickListener== arg2:" + arg2);
+            }
+        });
 
         mIndicator = (CircleFlowIndicator) mHeaderView.findViewById(R.id.viewflowindic);
         mViewFlow.setFlowIndicator(mIndicator);
@@ -219,12 +228,6 @@ public class NewsListFragment extends Fragment implements SwipeRefreshLayout.OnR
     @Override
     public void onRefresh() {
         // TODO Auto-generated method stub
-        //        new Handler().postDelayed(new Runnable() {
-        //            @Override
-        //            public void run() {
-        //                mSwipeRefreshLayout.setRefreshing(false);
-        //            }
-        //        }, 3000);
         mIsResetList = true;
         updateNewsList(mTodayDateString, true);
     }
@@ -323,6 +326,13 @@ public class NewsListFragment extends Fragment implements SwipeRefreshLayout.OnR
         for (NewsModel news : model.getNewsList()) {
             news.setDate(date);
         }
+        ArrayList<NewsModel> hotList = (ArrayList<NewsModel>) model.getTopStories();
+        if (hotList != null) {
+            for (NewsModel news : hotList) {
+                news.setDate(date);
+            }
+        }
+
         if (mIsResetList) {
             ArrayList<DailyNewsModel> list = new ArrayList<DailyNewsModel>();
             list.add(model);

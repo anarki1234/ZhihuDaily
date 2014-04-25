@@ -5,19 +5,22 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.kevin.zhihudaily.Constants;
 import com.kevin.zhihudaily.R;
 import com.kevin.zhihudaily.model.NewsModel;
 import com.squareup.picasso.Picasso;
 
 public class TopStoryAdapter extends BaseAdapter {
-
+    private String TAG = "TopStoryAdapter";
     private WeakReference<Context> mContextWR;
     private List<NewsModel> mDataList;
 
@@ -108,9 +111,28 @@ public class TopStoryAdapter extends BaseAdapter {
         }
 
         NewsModel model = mDataList.get(position);
+        holder.imageView.setOnClickListener(mClickListener);
+        holder.imageView.setTag(position);
         Picasso.with(mContextWR.get()).load(model.getImage()).placeholder(R.drawable.image_top_default).fit()
                 .centerCrop().into(holder.imageView);
 
         holder.titleTextView.setText(model.getTitle());
     }
+
+    private OnClickListener mClickListener = new OnClickListener() {
+
+        @Override
+        public void onClick(View v) {
+            // TODO Auto-generated method stub
+            int position = (Integer) v.getTag();
+            NewsModel model = mDataList.get(position);
+            Intent intent = new Intent(mContextWR.get(), NewsDetailActivity.class);
+            intent.putExtra(Constants.INTENT_NEWS_ID, model.getId());
+            intent.putExtra(Constants.INTENT_NEWS_DATE, model.getDate());
+            //            Log.d(TAG, "==id=" + model.getId() + "  date=" + model.getDate() + "  pos=" + position);
+
+            mContextWR.get().startActivity(intent);
+        }
+    };
+
 }
