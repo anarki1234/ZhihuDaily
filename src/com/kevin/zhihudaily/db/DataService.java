@@ -85,10 +85,12 @@ public class DataService extends IntentService {
             if (news_date == null || news_id == -1) {
                 break;
             }
-            String news_body = DataBaseManager.getInstance().readNewsBody(news_id);
-            if (news_body != null) {
+            //            String news_body = DataBaseManager.getInstance().readNewsBody(news_id);
+            NewsModel model = DataBaseManager.getInstance().readNewsBodyAndImageSource(news_id);
+            if (model != null) {
                 // Update to cache
-                DataCache.getInstance().updateNewsBodyByID(news_date, news_id, news_body);
+                DataCache.getInstance().updateNewsDetailByID(news_date, news_id, model.getBody(),
+                        model.getImage_source());
 
                 // Notify ui to update
                 mBroadcastNotifier.notifyNewsBodyDataReady(news_date, news_id);
@@ -155,7 +157,7 @@ public class DataService extends IntentService {
         NewsModel model = ZhihuRequest.getRequestService().getNewsById(id);
         //        Log.d(TAG, "==ModelBody=" + model.getBody());
         if (model != null) {
-            DataCache.getInstance().updateNewsBodyByID(date, id, model.getBody());
+            DataCache.getInstance().updateNewsDetailByID(date, id, model.getBody(), model.getImage_source());
 
             // Notify ui to update
             mBroadcastNotifier.notifyNewsBodyDataReady(date, id);

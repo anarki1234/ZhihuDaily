@@ -66,12 +66,13 @@ public class DataCache {
         mNewsMap.clear();
     }
 
-    public boolean updateNewsBodyByID(String key, int id, String body) {
+    public boolean updateNewsDetailByID(String key, int id, String body, String imageSource) {
         DailyNewsModel dailyModel = mDailyMap.get(key.hashCode());
         ArrayList<NewsModel> list = (ArrayList<NewsModel>) dailyModel.getNewsList();
         for (NewsModel model : list) {
             if (model.getId() == id) {
                 model.setBody(body);
+                model.setImage_source(imageSource);
                 return true;
             }
         }
@@ -93,6 +94,9 @@ public class DataCache {
     }
 
     public String getNewsBodyByDateAndID(String key, int id) {
+        if (key == null || id == -1) {
+            return null;
+        }
         DailyNewsModel dailyModel = mDailyMap.get(key.hashCode());
         ArrayList<NewsModel> list = (ArrayList<NewsModel>) dailyModel.getNewsList();
         for (NewsModel model : list) {

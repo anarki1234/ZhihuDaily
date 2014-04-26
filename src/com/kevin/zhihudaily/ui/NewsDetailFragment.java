@@ -186,6 +186,10 @@ public class NewsDetailFragment extends Fragment implements SwipeRefreshLayout.O
         String body = mNewsModel.getBody();
         if (body != null) {
             updateWebView(body);
+            String imageSource = mNewsModel.getImage_source();
+            if (imageSource != null) {
+                mSourceTextView.setText(imageSource);
+            }
         } else {
             if (ZhihuDailyApplication.sIsConnected) {
                 //                requestNewsDetail();
@@ -214,22 +218,6 @@ public class NewsDetailFragment extends Fragment implements SwipeRefreshLayout.O
         mWebView.loadDataWithBaseURL("file:///android_asset/", htmldata, "text/html", "UTF-8", null);
     }
 
-    private class AsyncRunnable implements Runnable {
-        private NewsModel model;
-
-        private AsyncRunnable(NewsModel model) {
-            this.model = model;
-        }
-
-        @Override
-        public void run() {
-            // TODO Auto-generated method stub
-            String htmldata = optimizeHtml(mNewsModel.getBody());
-            mWebView.loadDataWithBaseURL("file:///android_asset/", htmldata, "text/html", "UTF-8", null);
-        }
-
-    }
-
     @Override
     public void onRefresh() {
         // TODO Auto-generated method stub
@@ -253,11 +241,21 @@ public class NewsDetailFragment extends Fragment implements SwipeRefreshLayout.O
             String date = intent.getStringExtra(Constants.INTENT_NEWS_DATE);
             int id = intent.getIntExtra(Constants.INTENT_NEWS_ID, -1);
             if (id == mNewsModel.getId()) {
-                String body = DataCache.getInstance().getNewsBodyByDateAndID(date, id);
-                mNewsModel.setBody(body);
+                NewsModel model = DataCache.getInstance().getNewsModelByDateAndID(date, id);
+                if (model != null) {
+                    // Update ui
+                    String body = model.getBody();
+                    mNewsModel.setBody(model.getBody());
+                    updateWebView(body);
 
-                // Update ui
-                updateWebView(body);
+                    // update image source
+                    String imageSource = model.getImage_source();
+                    mNewsModel.setImage_source(imageSource);
+                    if (imageSource != null) {
+                        mSourceTextView.setText(imageSource);
+                    }
+
+                }
 
                 // Write to db
                 //                Intent dbintent = new Intent(getActivity(), DataService.class);

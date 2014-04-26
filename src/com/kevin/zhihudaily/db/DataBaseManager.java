@@ -325,4 +325,27 @@ public class DataBaseManager {
         }
         return body;
     }
+
+    public NewsModel readNewsBodyAndImageSource(int id) {
+        NewsModel model = null;
+        if (!db.isOpen()) {
+            db = mHelper.getReadableDatabase();
+        }
+
+        String[] columns = { DataBaseConstants.ID, DataBaseConstants.BODY };
+        String selection = "id=?";
+        String[] selectionArgs = { String.valueOf(id) };
+        Cursor cursor = db
+                .query(DataBaseConstants.NEWS_TABLE_NAME, columns, selection, selectionArgs, null, null, null);
+        if (cursor != null && cursor.getCount() > 0 && cursor.moveToFirst()) {
+            // read image source
+            model.setImage_source(cursor.getString(cursor.getColumnIndexOrThrow(DataBaseConstants.IMAGE_SOURCE)));
+
+            // read body
+            model.setBody(cursor.getString(cursor.getColumnIndexOrThrow(DataBaseConstants.BODY)));
+
+            cursor.close();
+        }
+        return model;
+    }
 }
