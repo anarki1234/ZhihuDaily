@@ -2,7 +2,7 @@
     xmlns:myapp="http://schemas.android.com/apk/res-auto" >
 
     <item android:id="@+id/action_refresh"
-          android:icon="@drawable/ic_action_refresh"
+          android:icon="@drawable/ic_launcher"
           android:title="@string/action_websearch"
           myapp:showAsAction="always"
           android:showAsAction="ifRoom|withText" />

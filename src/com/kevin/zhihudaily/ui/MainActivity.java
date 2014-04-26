@@ -1,9 +1,7 @@
 package com.kevin.zhihudaily.ui;
 
 import android.annotation.SuppressLint;
-import android.app.SearchManager;
 import android.content.Context;
-import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -20,14 +18,12 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import com.kevin.zhihudaily.R;
 import com.kevin.zhihudaily.ZhihuDailyApplication;
@@ -144,8 +140,8 @@ public class MainActivity extends ActionBarActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.main, menu);
+        //        MenuInflater inflater = getMenuInflater();
+        //        inflater.inflate(R.menu.main, menu);
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -155,7 +151,7 @@ public class MainActivity extends ActionBarActivity {
         // If the nav drawer is open, hide action items related to the content
         // view
         boolean drawerOpen = mDrawerLayout.isDrawerOpen(mDrawerList);
-        menu.findItem(R.id.action_refresh).setVisible(!drawerOpen);
+        //        menu.findItem(R.id.action_refresh).setVisible(!drawerOpen);
         return super.onPrepareOptionsMenu(menu);
     }
 
@@ -169,17 +165,17 @@ public class MainActivity extends ActionBarActivity {
         }
         // Handle action buttons
         switch (item.getItemId()) {
-        case R.id.action_refresh:
-            // create intent to perform web search for this planet
-            Intent intent = new Intent(Intent.ACTION_WEB_SEARCH);
-            intent.putExtra(SearchManager.QUERY, getActionBar().getTitle());
-            // catch event that there's no activity to handle intent
-            if (intent.resolveActivity(getPackageManager()) != null) {
-                startActivity(intent);
-            } else {
-                Toast.makeText(this, R.string.app_not_available, Toast.LENGTH_LONG).show();
-            }
-            return true;
+        //        case R.id.action_refresh:
+        //            // create intent to perform web search for this planet
+        //            Intent intent = new Intent(Intent.ACTION_WEB_SEARCH);
+        //            intent.putExtra(SearchManager.QUERY, getActionBar().getTitle());
+        //            // catch event that there's no activity to handle intent
+        //            if (intent.resolveActivity(getPackageManager()) != null) {
+        //                startActivity(intent);
+        //            } else {
+        //                Toast.makeText(this, R.string.app_not_available, Toast.LENGTH_LONG).show();
+        //            }
+        //            return true;
         default:
             return super.onOptionsItemSelected(item);
         }
