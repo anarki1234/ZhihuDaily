@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.kevin.zhihudaily.ui;
+package com.kevin.zhihudaily.view;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;

@@ -41,6 +41,8 @@ import com.kevin.zhihudaily.db.DataService;
 import com.kevin.zhihudaily.model.DailyNewsModel;
 import com.kevin.zhihudaily.model.NewsModel;
 import com.kevin.zhihudaily.ui.NewsListAdapter.ListItem;
+import com.kevin.zhihudaily.view.HeaderViewFlow;
+import com.kevin.zhihudaily.view.TopStoryAdapter;
 
 public class NewsListFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
 
@@ -55,11 +57,11 @@ public class NewsListFragment extends Fragment implements SwipeRefreshLayout.OnR
     private View mHeaderView;
     private HeaderViewFlow mViewFlow;
 
-    // ²Ëµ¥µ×²¿×Ô¶¯¼ÓÔØÌõ
+    // Foot view for loading more list items
     private View mFooterView = null;
 
     /**
-     * ÊÇ·ñÖØÖÃListViewÊý¾Ý
+     * A mark for reset all list data
      */
     private boolean mIsResetList = false;
 
@@ -237,16 +239,16 @@ public class NewsListFragment extends Fragment implements SwipeRefreshLayout.OnR
         @Override
         public void onScrollStateChanged(AbsListView view, int scrollState) {
             // TODO Auto-generated method stub
-            //µ±²»¹ö¶¯Ê±
+            //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê±
             if (scrollState == AbsListView.OnScrollListener.SCROLL_STATE_IDLE) {
 
-                //ÅÐ¶Ï¹ö¶¯µ½µ×²¿
+                //ï¿½Ð¶Ï¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½×²ï¿½
                 if (view.getLastVisiblePosition() == (view.getCount() - 1)) {
                     //                    if (!mOrderInfoModel.isLoadComplete() && !mController.isLoadingNow()) {
-                    // »¬¶¯µ½µ×²¿
+                    // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½×²ï¿½
                     mFooterView.setVisibility(View.VISIBLE);
                     mListView.setSelection(view.getCount() - 1);
-                    // ·¢ÆðÊý¾ÝÇëÇó
+                    // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
                     Calendar calendar = Calendar.getInstance();
                     calendar.add(Calendar.DATE, 0 - preDays);
                     SimpleDateFormat sf = new SimpleDateFormat("yyyyMMdd");

@@ -1,4 +1,4 @@
-package com.kevin.zhihudaily.ui;
+package com.kevin.zhihudaily.view;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -17,6 +17,7 @@ import android.widget.TextView;
 import com.kevin.zhihudaily.Constants;
 import com.kevin.zhihudaily.R;
 import com.kevin.zhihudaily.model.NewsModel;
+import com.kevin.zhihudaily.ui.NewsDetailActivity;
 import com.squareup.picasso.Picasso;
 
 public class TopStoryAdapter extends BaseAdapter {

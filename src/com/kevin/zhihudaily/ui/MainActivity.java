@@ -49,6 +49,7 @@ public class MainActivity extends ActionBarActivity {
         Log.d(TAG, "==onCreate==");
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
+        getWindow().setBackgroundDrawable(null);
         setContentView(R.layout.activity_main);
 
         mTitle = mDrawerTitle = getTitle();

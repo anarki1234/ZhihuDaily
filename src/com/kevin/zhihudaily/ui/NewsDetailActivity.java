@@ -8,6 +8,8 @@ import android.annotation.TargetApi;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -32,6 +34,8 @@ public class NewsDetailActivity extends ActionBarActivity implements OnClickList
     private static final String TAG = "NewsDetailActivity";
     private DetailPagerAdapter mAdapter;
     private ViewPager mPager;
+    private Drawable mActionBarDrawable;
+
     private int mNewsNum = 1;
     private NewsModel mSelectModel = new NewsModel();
 
@@ -85,10 +89,20 @@ public class NewsDetailActivity extends ActionBarActivity implements OnClickList
 
         // Hide title text and set home as up
         getActionBar().setIcon(R.drawable.topbar_icon);
-        getActionBar().setDisplayShowTitleEnabled(false);
+        getActionBar().setDisplayShowTitleEnabled(true);
         getActionBar().setDisplayHomeAsUpEnabled(true);
-        getActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#33000000")));
+        //        getActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#33000000")));
 
+        // Set the title to empty char
+        getActionBar().setTitle("");
+
+        mActionBarDrawable = new ColorDrawable(Color.parseColor("#ff33b5e5"));
+        mActionBarDrawable.setAlpha(0);
+        //        getActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#00000000")));
+        getActionBar().setBackgroundDrawable(mActionBarDrawable);
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            mActionBarDrawable.setCallback(mDrawableCallback);
+        }
         // Hide and show the ActionBar as the visibility changes
         mPager.setOnSystemUiVisibilityChangeListener(new View.OnSystemUiVisibilityChangeListener() {
             @Override
@@ -189,4 +203,30 @@ public class NewsDetailActivity extends ActionBarActivity implements OnClickList
         }
     }
 
+    private Drawable.Callback mDrawableCallback = new Drawable.Callback() {
+        @SuppressLint("NewApi")
+        @Override
+        public void invalidateDrawable(Drawable who) {
+            getActionBar().setBackgroundDrawable(who);
+        }
+
+        @Override
+        public void scheduleDrawable(Drawable who, Runnable what, long when) {
+        }
+
+        @Override
+        public void unscheduleDrawable(Drawable who, Runnable what) {
+        }
+    };
+
+    public void setActionBarAlpha(int alpha) {
+        mActionBarDrawable.setAlpha(alpha);
+    }
+
+    @SuppressLint("NewApi")
+    public void setActionBarTitle(String title) {
+        if (title != null) {
+            getActionBar().setTitle(title);
+        }
+    }
 }

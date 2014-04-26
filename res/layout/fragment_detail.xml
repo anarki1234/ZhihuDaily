@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.kevin.zhihudaily.ui.ExScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.kevin.zhihudaily.view.ExScrollView xmlns:android="http://schemas.android.com/apk/res/android"
 	android:layout_width="match_parent"
 	android:layout_height="match_parent" >
-	<com.kevin.zhihudaily.ui.ExWebView
+<com.kevin.zhihudaily.view.ExWebViewew
 	    android:id="@+id/webview"
 	    android:layout_width="match_parent"
 	    android:layout_height="wrap_content"
 	    android:scrollbars="none"
 	    />
-</com.kevin.zhihudaily.ui.ExScrollView>
+</com.kevin.zhihudaily.view.ExScrollView>

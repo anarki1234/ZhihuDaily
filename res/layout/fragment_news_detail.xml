@@ -3,7 +3,8 @@
     android:id="@+id/swipe_container" 
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-<ScrollView
+<com.kevin.zhihudaily.view.ExScrollView
+    android:id="@+id/scroll_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true"
@@ -61,7 +62,7 @@
 			    android:layout_alignParentBottom="true" 
 			    android:textIsSelectable="false" />
 		</RelativeLayout>
-	   	<com.kevin.zhihudaily.ui.ExWebView 
+	   	<com.kevin.zhihudaily.view.ExWebView 
 	   	    android:id="@+id/wv_webview"
 	   	    android:layout_width="match_parent"
 	   	    android:layout_height="wrap_content"
@@ -71,5 +72,5 @@
 	   	    />
         
     </LinearLayout>
-</ScrollView>
+</com.kevin.zhihudaily.view.ExScrollView>
 </android.support.v4.widget.SwipeRefreshLayout>

@@ -1,5 +1,6 @@
 package com.kevin.zhihudaily.ui;
 
+import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -14,6 +15,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.kevin.zhihudaily.Constants;
@@ -22,12 +24,16 @@ import com.kevin.zhihudaily.ZhihuDailyApplication;
 import com.kevin.zhihudaily.db.DataCache;
 import com.kevin.zhihudaily.db.DataService;
 import com.kevin.zhihudaily.model.NewsModel;
+import com.kevin.zhihudaily.view.ExScrollView;
+import com.kevin.zhihudaily.view.ExWebView;
 import com.squareup.picasso.Picasso;
 
 public class NewsDetailFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
     private static final String TAG = "NewsDetailFragment";
     private View mRootView;
     private SwipeRefreshLayout mSwipeRefreshLayout;
+    private ExScrollView mScrollView;
+
     private ImageView mImageView;
     private TextView mTitleTextView;
     private TextView mSourceTextView;
@@ -36,7 +42,7 @@ public class NewsDetailFragment extends Fragment implements SwipeRefreshLayout.O
 
     private NewsDetailReadyReceiver mDetailReadyReceiver;
 
-    String html = "<div class=\"main-wrap content-wrap\">\n<div class=\"headline\">\n\n<div class=\"img-place-holder\"></div>\n\n\n</div>\n<div class=\"content-inner\">\n\n\n\n\n<div class=\"question\">\n<h2 class=\"question-title\">дЦцг╣двНдцйж╨ц╡кйгй╡ц╢ё©вЖ╥╗©ирт╥жоМр╩оббПё©</h2>\n\n<div class=\"answer\">\n\n<div class=\"meta\">\n<img class=\"avatar\" src=\"http://p1.zhimg.com/02/fc/02fcc5074_is.jpg\">\n<span class=\"author\">е╣е╣аёаё</span>\n</div>\n\n<div class=\"content\">\n<p>р╩ж╠тзв╫цЧ 100 жжиу╪╕╣д╥╫й╫║ё</p>\r\n<p>╦Вжжиу╪╕ЁА╡╩л╚оКлАак║ё</p>\r\n<p><img src=\"http://p3.zhimg.com/52/94/52946266f5ddd4ade2aab4600aef2541_m.jpg\" alt=\"\" /></p>\r\n<p>╢Сел╪╕║ё</p>\r\n<p>р╩╦Жм╛я╖╫л╣дё╛ма╤╧╨м╪╕©Иоху╗р╩об║ё</p>\r\n<p>юлфПю╢ё╛ххсм╥е╩╗╫╥╟к╫гё╛╟яу╗╧Щ╣д╪╕╨мма╤╧об╧Ь║ём╛й╠╥егп╨ц╣д╡й╫╥д╒╧╫ё╛╨м╨э╤Ю╤╧╟Й╫╢ё╛╪ск╝║ё</p>\r\n<p>нрж╝╨С╬м╡╩сцянакё╛╧Б╤╧╟Й╫╢╬м╧╩олакё╛ж╩╪ср╩╣Цлгё╛внх╩╨мбИсм╣Вн╤║ё</p>\r\n<p>йу╦ик╝ЁЖ╧Ьг╟гпа╫╤н╢п║ё</p>\r\n<p>╣зр╩╢нвЖ╣дй╠╨Рё╛оВма╤╧ф╓ж╦╪веЭак║ё</p>\r\n<p>╟║╩╧сп╢псм╪╕</p>\r\n<p>уБ╦Ж╠х╫обИ╥Ёак║ёрРн╙р╙╟╬╢псм║ё</p>\r\n<p><img src=\"http://p2.zhimg.com/08/a6/08a612a811a2a6714ec15d170b25c76b_m.jpg\" alt=\"\" /></p>\r\n<p>сци╚ю╜см╟яблсмсм╣дп║╢п╟╬Ёи╩фи╚║ёх╩╨СбктЭё╛ж╩сцсм║ё</p>\r\n<p>╫собю╢╬мйг╟я╪╕жС╨цак║ё╪сакоЦсм╣дк╝иу©╙ё╛╪╕╥е╫Ьх╔ё╛╧ь╩П╦г╦гвсё╛сцк╝╣дсЮнб╟я╪╕ллйЛё╛уБяЫвс╪╕╧гм╥юО╡е╩А╠ёаТя╙к©║ё╧Ц╤╚╣д╟вгп╪╕╤╪йгуБяЫвЖ╣д║ё╣хк╝нб╤х╫╣обю╢ё╛╪╕юлЁЖю╢╥еелвсюОё╛иу©╙к╝ё╛╪╕тыхКк╝║ё╥╢╦╢ 3,4 ╢н╡Н╡╩╤Ю╬м╨цак║ёюлЁЖю╢╪╕гп©И║ё</p>\r\n<p>х╩╨Сдьё╛╢п╫╙гпкИё╛╥е╫Ь╦у╦у╟╬╨ц╣д╢псмюОё╛м╛й╠╦Ы╬щвт╪╨©зн╤╪сюоЁИ╫╢смянлг║ё</p>\r\n<p><img src=\"http://p2.zhimg.com/61/e6/61e697cb4e73c8cfeba6f266087342b1_m.jpg\" alt=\"\" /></p>\r\n<p>╫╢ж╜вЖ╨цакё╛╬маэ╣╫╪╕©Иио║ё</p>\r\n<p>уБ╦Ж╡км╕╥Ё╣дё╛╪╕╡╩дэ╥е╩Пиож╠╫сжСё╛╩П©╙©╙мёмё╨элжяА║ё╩╧сп╟╬мЙ╢псмр╩иМ╢п╣дн╤╣юё╛м╥╥╒юОж╦╪вюО╤╪йг║ё</p>\r\n<p><strong>кЫртхГ╧Шсп╧цдОт╦рБ╦ЬдЦиур╩╦ЖуБяЫ╣д╡кё╛╡╩р╙гСдЦЁтмЙ╟якЩ╦Ьх╒акё╛жаиы╪г╣ц╟Овео╢мК║ё</strong></p>\n</div>\n</div>\n\n\n<div class=\"view-more\"><a href=\"http://www.zhihu.com/question/20191205\">╡И©╢ж╙╨Улжбш<span class=\"js-question-holder\"></span></a></div>\n\n</div>\n\n\n</div>\n</div>";
+    String html = "<div class=\"main-wrap content-wrap\">\n<div class=\"headline\">\n\n<div class=\"img-place-holder\"></div>\n\n\n</div>\n<div class=\"content-inner\">\n\n\n\n\n<div class=\"question\">\n<h2 class=\"question-title\">О©╫О©╫О©╫г╣О©╫О©╫О©╫О©╫О©╫О©╫ж╨ц╡О©╫О©╫О©╫й╡ц╢О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫т╥О©╫О©╫О©╫р╩О©╫О©╫О©╫О©╫</h2>\n\n<div class=\"answer\">\n\n<div class=\"meta\">\n<img class=\"avatar\" src=\"http://p1.zhimg.com/02/fc/02fcc5074_is.jpg\">\n<span class=\"author\">е╣е╣О©╫О©╫О©╫О©╫</span>\n</div>\n\n<div class=\"content\">\n<p>р╩ж╠О©╫О©╫в╫О©╫О©╫ 100 О©╫О©╫О©╫у╪О©╫О©╫д╥О©╫й╫О©╫О©╫</p>\r\n<p>О©╫О©╫О©╫О©╫О©╫у╪О©╫О©╫А╡╩л╚О©╫О©╫О©╫О©╫О©╫к║О©╫</p>\r\n<p><img src=\"http://p3.zhimg.com/52/94/52946266f5ddd4ade2aab4600aef2541_m.jpg\" alt=\"\" /></p>\r\n<p>О©╫О©╫О©╫л╪О©╫О©╫О©╫</p>\r\n<p>р╩О©╫О©╫м╛я╖О©╫л╣дёО©╫О©╫О©╫О©╫О©╫О©╫м╪О©╫О©╫О©╫О©╫О©╫у╗р╩О©╫б║О©╫</p>\r\n<p>О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫м╥е╩О©╫О©╫О©╫О©╫к╫гёО©╫О©╫О©╫у╗О©╫О©╫д╪О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫б╧О©╫м╛й╠О©╫О©╫О©╫п╨ц╣д╡й╫О©╫д╒О©╫О©╫О©╫О©╫О©╫м╨э╤Ю╤╧О©╫Й╫╢О©╫О©╫О©╫О©╫к╝О©╫О©╫</p>\r\n<p>О©╫О©╫ж╝О©╫О©╫м╡О©╫О©╫О©╫О©╫О©╫О©╫кёО©╫О©╫Б╤╧О©╫Й╫╢О©╫м╧О©╫О©╫О©╫О©╫кёО©╫ж╩О©╫О©╫р╩О©╫О©╫О©╫гёО©╫О©╫О©╫х╩О©╫О©╫О©╫О©╫О©╫м╣О©╫н╤О©╫О©╫</p>\r\n<p>О©╫у╦О©╫к╝О©╫О©╫О©╫О©╫г╟О©╫О©╫О©╫О©╫О©╫н╢п║О©╫</p>\r\n<p>О©╫О©╫р╩О©╫О©╫О©╫О©╫О©╫О©╫й╠О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫ф╓ж╦О©╫О©╫О©╫О©╫О©╫к║О©╫</p>\r\n<p>О©╫О©╫О©╫О©╫О©╫п╢О©╫О©╫м╪О©╫</p>\r\n<p>О©╫О©╫О©╫О©╫х╫О©╫О©╫И╥ЁО©╫к║О©╫О©╫О©╫н╙р╙О©╫О©╫О©╫О©╫О©╫м║О©╫</p>\r\n<p><img src=\"http://p2.zhimg.com/08/a6/08a612a811a2a6714ec15d170b25c76b_m.jpg\" alt=\"\" /></p>\r\n<p>О©╫О©╫и╚О©╫О©╫О©╫м╟О©╫О©╫О©╫О©╫О©╫О©╫м╣О©╫п║О©╫п╟О©╫О©╫и╩О©╫и╚О©╫О©╫х╩О©╫О©╫О©╫О©╫О©╫О©╫ж╩О©╫О©╫О©╫м║О©╫</p>\r\n<p>О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫г╟я╪О©╫О©╫О©╫О©╫О©╫к║О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫м╣О©╫к╝О©╫у©О©╫О©╫О©╫О©╫О©╫О©╫е╫О©╫х╔О©╫О©╫О©╫ь╩О©╫г╦О©╫О©╫сёО©╫О©╫О©╫к╝О©╫О©╫О©╫О©╫О©╫б╟я╪О©╫О©╫О©╫О©╫Лё╛О©╫О©╫О©╫О©╫О©╫с╪О©╫О©╫О©╫м╥О©╫О©╫е╩А╠ёО©╫О©╫я╙к©О©╫О©╫О©╫Ц╤╚О©╫д╟О©╫О©╫п╪О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫д║О©╫О©╫О©╫к╝О©╫б╤х╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫лЁО©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫Оё╛О©╫у©О©╫к╝О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫к╝О©╫О©╫О©╫О©╫О©╫О©╫ 3,4 О©╫н╡Н╡╩О©╫О©╫м╨О©╫О©╫к║О©╫О©╫лЁО©╫О©╫О©╫О©╫О©╫О©╫п©И║ё</p>\r\n<p>х╩О©╫О©╫О©╫ьёО©╫О©╫п╫О©╫О©╫О©╫О©╫Иё╛О©╫е╫О©╫у╦у╟О©╫О©╫ц╣д╢О©╫О©╫О©╫О©╫Оё╛м╛й╠О©╫О©╫О©╫О©╫т╪О©╫О©╫О©╫н╤О©╫О©╫О©╫оЁИ╫╢О©╫О©╫О©╫О©╫О©╫г║О©╫</p>\r\n<p><img src=\"http://p2.zhimg.com/61/e6/61e697cb4e73c8cfeba6f266087342b1_m.jpg\" alt=\"\" /></p>\r\n<p>О©╫О©╫ж╜О©╫О©╫О©╫О©╫О©╫кёО©╫О©╫О©╫О©╫э╣О©╫О©╫О©╫О©╫О©╫О©╫о║О©╫</p>\r\n<p>О©╫О©╫О©╫О©╫О©╫м╕О©╫О©╫О©╫дёО©╫О©╫О©╫О©╫О©╫О©╫э╥е╩О©╫О©╫О©╫ж╠О©╫О©╫О©╫Сё╛╩П©╙©О©╫мёмёО©╫О©╫О©╫О©╫О©╫А║ёО©╫О©╫О©╫п╟О©╫О©╫О©╫О©╫О©╫О©╫р╩О©╫О©╫п╣О©╫н╤О©╫О©╫О©╫О©╫м╥О©╫О©╫О©╫О©╫ж╦О©╫О©╫О©╫О╤╪О©╫г║О©╫</p>\r\n<p><strong>О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫п╧О©╫О©╫О©╫т╦О©╫О©╫О©╫О©╫О©╫О©╫О©╫р╩О©╫О©╫О©╫О©╫О©╫О©╫д╡кёО©╫О©╫О©╫р╙О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫х╒О©╫кёО©╫О©╫О©╫О©╫ы╪г╣ц╟О©╫О©╫О©╫о╢О©╫К║ё</strong></p>\n</div>\n</div>\n\n\n<div class=\"view-more\"><a href=\"http://www.zhihu.com/question/20191205\">О©╫И©╢ж╙О©╫О©╫О©╫О©╫О©╫О©╫<span class=\"js-question-holder\"></span></a></div>\n\n</div>\n\n\n</div>\n</div>";
 
     public static NewsDetailFragment newInstance(NewsModel model) {
         final NewsDetailFragment detailFragment = new NewsDetailFragment();
@@ -115,6 +121,9 @@ public class NewsDetailFragment extends Fragment implements SwipeRefreshLayout.O
         mSwipeRefreshLayout.setOnRefreshListener(this);
         mSwipeRefreshLayout.setColorScheme(android.R.color.holo_blue_bright, android.R.color.holo_green_light,
                 android.R.color.holo_orange_light, android.R.color.holo_red_light);
+
+        mScrollView = (ExScrollView) mRootView.findViewById(R.id.scroll_view);
+        mScrollView.setOnScrollChangedListener(mOnScrollChangedListener);
 
         mImageView = (ImageView) mRootView.findViewById(R.id.iv_image);
         mTitleTextView = (TextView) mRootView.findViewById(R.id.tv_news_title);
@@ -251,13 +260,32 @@ public class NewsDetailFragment extends Fragment implements SwipeRefreshLayout.O
                 updateWebView(body);
 
                 // Write to db
-                Intent dbintent = new Intent(getActivity(), DataService.class);
-                intent.putExtra(Constants.INTENT_NEWS_ID, id);
-                intent.putExtra(Constants.INTENT_NEWS_BODY, body);
-                intent.putExtra(Constants.INTENT_ACTION_TYPE, Constants.ACTION_WRITE_NEWS_DEATIL);
-                getActivity().startService(intent);
+                //                Intent dbintent = new Intent(getActivity(), DataService.class);
+                //                dbintent.putExtra(Constants.INTENT_NEWS_ID, id);
+                //                dbintent.putExtra(Constants.INTENT_NEWS_BODY, body);
+                //                dbintent.putExtra(Constants.INTENT_ACTION_TYPE, Constants.ACTION_WRITE_NEWS_DEATIL);
+                //                getActivity().startService(dbintent);
             }
         }
 
     }
+
+    private ExScrollView.OnScrollChangedListener mOnScrollChangedListener = new ExScrollView.OnScrollChangedListener() {
+        @SuppressLint("NewApi")
+        public void onScrollChanged(ScrollView who, int l, int t, int oldl, int oldt) {
+            final int headerHeight = mImageView.getHeight()
+                    - ((NewsDetailActivity) getActivity()).getActionBar().getHeight();
+
+            final float ratio = (float) Math.min(Math.max(t, 0), headerHeight) / headerHeight;
+            final int newAlpha = (int) (ratio * 255);
+            ((NewsDetailActivity) getActivity()).setActionBarAlpha(newAlpha);
+
+            if (newAlpha >= 240) {
+                ((NewsDetailActivity) getActivity()).setActionBarTitle(mNewsModel.getTitle());
+            } else {
+                ((NewsDetailActivity) getActivity()).setActionBarTitle("");
+            }
+        }
+    };
+
 }
