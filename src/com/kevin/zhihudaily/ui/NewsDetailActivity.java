@@ -15,6 +15,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.support.v7.app.ActionBarActivity;
 import android.util.DisplayMetrics;
 import android.view.View;
@@ -36,6 +37,7 @@ public class NewsDetailActivity extends ActionBarActivity implements OnClickList
     private ViewPager mPager;
     private Drawable mActionBarDrawable;
 
+    private DailyNewsModel mDailyNewsModel;
     private int mNewsNum = 1;
     private NewsModel mSelectModel = new NewsModel();
 
@@ -70,15 +72,16 @@ public class NewsDetailActivity extends ActionBarActivity implements OnClickList
         }
 
         // Read from cache for viewpager data
-        DailyNewsModel dailyNewsModel = DataCache.getInstance().getDailyNewsModel(dateKey);
-        mNewsNum = dailyNewsModel.getNewsList().size();
+        mDailyNewsModel = DataCache.getInstance().getDailyNewsModel(dateKey);
+        mNewsNum = mDailyNewsModel.getNewsList().size();
 
         // Set up ViewPager and backing adapter
-        mAdapter = new DetailPagerAdapter(getSupportFragmentManager(), mNewsNum, dailyNewsModel);
+        mAdapter = new DetailPagerAdapter(getSupportFragmentManager(), mNewsNum, mDailyNewsModel);
         mPager = (ViewPager) findViewById(R.id.pager);
         mPager.setAdapter(mAdapter);
         mPager.setPageMargin((int) getResources().getDimension(R.dimen.news_detail_pager_margin));
         mPager.setOffscreenPageLimit(2);
+        mPager.setOnPageChangeListener(mPageChangeListener);
 
         // Set animation
         //        mPager.setPageTransformer(true, new ZoomOutPageTransformer());
@@ -125,7 +128,7 @@ public class NewsDetailActivity extends ActionBarActivity implements OnClickList
         if (extraCurrentItem != -1) {
             mPager.setCurrentItem(extraCurrentItem);
         } else {
-            ArrayList<NewsModel> list = (ArrayList<NewsModel>) dailyNewsModel.getNewsList();
+            ArrayList<NewsModel> list = (ArrayList<NewsModel>) mDailyNewsModel.getNewsList();
             extraCurrentItem = getIndexById(list, mSelectModel.getId());
             //            Log.e(TAG, "==pageindex_new==" + extraCurrentItem);
             if (extraCurrentItem != -1) {
@@ -229,4 +232,30 @@ public class NewsDetailActivity extends ActionBarActivity implements OnClickList
             getActionBar().setTitle(title);
         }
     }
+
+    private OnPageChangeListener mPageChangeListener = new OnPageChangeListener() {
+
+        @SuppressLint("NewApi")
+        @Override
+        public void onPageSelected(int position) {
+            // TODO Auto-generated method stub
+            NewsModel model = mDailyNewsModel.getNewsList().get(position);
+            String curTitle = getActionBar().getTitle().toString();
+            if (!curTitle.equals("")) {
+                getActionBar().setTitle(model.getTitle());
+            }
+        }
+
+        @Override
+        public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+            // TODO Auto-generated method stub
+
+        }
+
+        @Override
+        public void onPageScrollStateChanged(int state) {
+            // TODO Auto-generated method stub
+
+        }
+    };
 }
