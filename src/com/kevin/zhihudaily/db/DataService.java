@@ -13,6 +13,7 @@ import android.util.Log;
 import com.kevin.zhihudaily.Constants;
 import com.kevin.zhihudaily.http.BroadcastNotifier;
 import com.kevin.zhihudaily.http.ZhihuRequest;
+import com.kevin.zhihudaily.model.CommentsModel;
 import com.kevin.zhihudaily.model.DailyNewsModel;
 import com.kevin.zhihudaily.model.NewsModel;
 
@@ -46,6 +47,8 @@ public class DataService extends IntentService {
         // TODO Auto-generated method stub
         Log.e(TAG, "==onHandleIntent");
         int action = intent.getIntExtra(Constants.INTENT_ACTION_TYPE, -1);
+        int id = intent.getIntExtra(Constants.INTENT_NEWS_ID, -1);
+        String date = intent.getStringExtra(Constants.INTENT_NEWS_DATE);
         switch (action) {
         case Constants.ACTION_WRITE_DAILY_NEWS:
             String key = intent.getStringExtra(Constants.INTENT_CACHE_ID);
@@ -58,7 +61,6 @@ public class DataService extends IntentService {
 
             break;
         case Constants.ACTION_WRITE_NEWS_DEATIL:
-            int id = intent.getIntExtra(Constants.INTENT_NEWS_ID, -1);
             String body = intent.getStringExtra(Constants.INTENT_NEWS_BODY);
             if (id == -1 || body == null) {
                 break;
@@ -67,7 +69,6 @@ public class DataService extends IntentService {
             DataBaseManager.getInstance().updateNewsBodyToDB(id, body, null);
             break;
         case Constants.ACTION_READ_DAILY_NEWS:
-            String date = intent.getStringExtra(Constants.INTENT_NEWS_DATE);
             if (date == null) {
                 break;
             }
@@ -80,37 +81,36 @@ public class DataService extends IntentService {
             }
             break;
         case Constants.ACTION_READ_NEWS_DEATIL:
-            int news_id = intent.getIntExtra(Constants.INTENT_NEWS_ID, -1);
-            String news_date = intent.getStringExtra(Constants.INTENT_NEWS_DATE);
-            if (news_date == null || news_id == -1) {
+            if (date == null || id == -1) {
                 break;
             }
             //            String news_body = DataBaseManager.getInstance().readNewsBody(news_id);
-            NewsModel model = DataBaseManager.getInstance().readNewsBodyAndImageSource(news_id);
+            NewsModel model = DataBaseManager.getInstance().readNewsBodyAndImageSource(id);
             if (model != null) {
                 // Update to cache
-                DataCache.getInstance().updateNewsDetailByID(news_date, news_id, model.getBody(),
-                        model.getImage_source());
+                DataCache.getInstance().updateNewsDetailByID(date, id, model.getBody(), model.getImage_source());
 
                 // Notify ui to update
-                mBroadcastNotifier.notifyNewsBodyDataReady(news_date, news_id);
+                mBroadcastNotifier.notifyNewsBodyDataReady(date, id);
             }
             break;
         case Constants.ACTION_GET_TODAY_NEWS:
             requestTodayNews();
             break;
         case Constants.ACTION_GET_DAILY_NEWS:
-            String date1 = intent.getStringExtra(Constants.INTENT_NEWS_DATE);
-            requestDailyNewsByDate(date1);
+            requestDailyNewsByDate(date);
             break;
         case Constants.ACTION_GET_NEWS_DETAIL:
-            String date2 = intent.getStringExtra(Constants.INTENT_NEWS_DATE);
-            int id2 = intent.getIntExtra(Constants.INTENT_NEWS_ID, -1);
-            requestNewsDetail(date2, id2);
+            requestNewsDetail(date, id);
             break;
         case Constants.ACTION_START_OFFLINE_DOWNLOAD:
-            String date3 = intent.getStringExtra(Constants.INTENT_NEWS_DATE);
-            startOfflineDownload(date3);
+            startOfflineDownload(date);
+            break;
+        case Constants.ACTION_GET_LONG_COMMENTS:
+            requestLongComments(id);
+            break;
+        case Constants.ACTION_GET_SHORT_COMMENTS:
+            requestShortComments(id);
             break;
         default:
             break;
@@ -214,6 +214,14 @@ public class DataService extends IntentService {
                 mBroadcastNotifier.notifyProgress(100);
             }
         }
+    }
+
+    private void requestLongComments(int id) {
+        CommentsModel model = ZhihuRequest.getRequestService().getLongCommentsById(id);
+    }
+
+    private void requestShortComments(int id) {
+        CommentsModel model = ZhihuRequest.getRequestService().getShortCommentsById(id);
     }
 
 }

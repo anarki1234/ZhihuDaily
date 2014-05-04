@@ -22,6 +22,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
 
+import com.baidu.mobstat.StatService;
 import com.kevin.zhihudaily.BuildConfig;
 import com.kevin.zhihudaily.Constants;
 import com.kevin.zhihudaily.R;
@@ -158,12 +159,14 @@ public class NewsDetailActivity extends ActionBarActivity implements OnClickList
     protected void onPause() {
         // TODO Auto-generated method stub
         super.onPause();
+        StatService.onPause(this);
     }
 
     @Override
     protected void onResume() {
         // TODO Auto-generated method stub
         super.onResume();
+        StatService.onResume(this);
     }
 
     private class DetailPagerAdapter extends FragmentStatePagerAdapter {

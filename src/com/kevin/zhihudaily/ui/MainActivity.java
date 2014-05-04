@@ -2,6 +2,7 @@ package com.kevin.zhihudaily.ui;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -25,6 +26,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import com.baidu.mobstat.StatService;
 import com.kevin.zhihudaily.R;
 import com.kevin.zhihudaily.ZhihuDailyApplication;
 
@@ -47,6 +49,9 @@ public class MainActivity extends ActionBarActivity {
         requestWindowFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
         getWindow().setBackgroundDrawable(null);
         setContentView(R.layout.activity_main);
+
+        // 调试百度统计SDK的Log开关，可以在Eclipse中看到sdk打印的日志，发布时去除调用，或者设置为false
+        StatService.setDebugOn(false);
 
         mTitle = mDrawerTitle = getTitle();
         mMenuTitles = getResources().getStringArray(R.array.menu_array);
@@ -98,7 +103,7 @@ public class MainActivity extends ActionBarActivity {
 
         if (savedInstanceState == null) {
             // TODO set
-            selectItem(0);
+            gotoHomePage();
         }
 
         // check network info
@@ -136,6 +141,14 @@ public class MainActivity extends ActionBarActivity {
     protected void onResume() {
         // TODO Auto-generated method stub
         super.onResume();
+        StatService.onResume(this);
+    }
+
+    @Override
+    protected void onPause() {
+        // TODO Auto-generated method stub
+        super.onPause();
+        StatService.onPause(this);
     }
 
     @Override
@@ -190,16 +203,42 @@ public class MainActivity extends ActionBarActivity {
     }
 
     private void selectItem(int position) {
+        switch (position) {
+        case 0:
+            gotoSettingsPage();
+            break;
+        case 1:
+            gotoAboutPage();
+            break;
+        default:
+            break;
+        }
+
+        // update selected item and title, then close the drawer
+        mDrawerList.setItemChecked(position, true);
+        //        if (position != 0) {
+        //            setTitle(mMenuTitles[position]);
+        //        }
+        mDrawerLayout.closeDrawer(mDrawerList);
+
+    }
+
+    private void gotoHomePage() {
         // update the main content by replacing fragments
         Fragment fragment = new NewsListFragment();
 
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).commit();
+    }
 
-        // update selected item and title, then close the drawer
-        mDrawerList.setItemChecked(position, true);
-        setTitle(mMenuTitles[position]);
-        mDrawerLayout.closeDrawer(mDrawerList);
+    private void gotoSettingsPage() {
+        Intent intent = new Intent(ZhihuDailyApplication.getInstance().getApplicationContext(), SettingActivity.class);
+        startActivity(intent);
+    }
+
+    private void gotoAboutPage() {
+        Intent intent = new Intent(ZhihuDailyApplication.getInstance().getApplicationContext(), AboutActivity.class);
+        startActivity(intent);
     }
 
     @SuppressLint("NewApi")

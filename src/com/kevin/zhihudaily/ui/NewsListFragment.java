@@ -32,6 +32,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 
+import com.baidu.mobstat.StatService;
 import com.kevin.zhihudaily.Constants;
 import com.kevin.zhihudaily.R;
 import com.kevin.zhihudaily.ZhihuDailyApplication;
@@ -103,6 +104,20 @@ public class NewsListFragment extends Fragment implements SwipeRefreshLayout.OnR
     }
 
     @Override
+    public void onPause() {
+        // TODO Auto-generated method stub
+        super.onPause();
+        StatService.onPause(this);
+    }
+
+    @Override
+    public void onResume() {
+        // TODO Auto-generated method stub
+        super.onResume();
+        StatService.onResume(this);
+    }
+
+    @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         // TODO Auto-generated method stub
         super.onViewCreated(view, savedInstanceState);
@@ -171,15 +186,6 @@ public class NewsListFragment extends Fragment implements SwipeRefreshLayout.OnR
         mTodayDateString = todayDate;
         updateNewsList(todayDate, true);
 
-        // Auto start data cache
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                if (ZhihuDailyApplication.sNetworkType == ConnectivityManager.TYPE_WIFI) {
-                    startDataCache(mTodayDateString);
-                }
-            }
-        }, 2000);
     }
 
     private void updateNewsList(String date, boolean isToday) {
@@ -362,14 +368,24 @@ public class NewsListFragment extends Fragment implements SwipeRefreshLayout.OnR
             intent.putExtra(Constants.INTENT_CACHE_ID, model.getDate());
             intent.putExtra(Constants.INTENT_ACTION_TYPE, Constants.ACTION_WRITE_DAILY_NEWS);
             getActivity().startService(intent);
+
+            // Auto start data cache
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    if (ZhihuDailyApplication.sNetworkType == ConnectivityManager.TYPE_WIFI) {
+                        startDataCache(mTodayDateString);
+                    }
+                }
+            }, 2000);
         }
     }
 
     private void startDataCache(String date) {
-        Intent intent = new Intent(getActivity(), DataService.class);
+        Intent intent = new Intent(ZhihuDailyApplication.getInstance().getApplicationContext(), DataService.class);
         intent.putExtra(Constants.INTENT_ACTION_TYPE, Constants.ACTION_START_OFFLINE_DOWNLOAD);
         intent.putExtra(Constants.INTENT_NEWS_DATE, date);
-        getActivity().startService(intent);
+        ZhihuDailyApplication.getInstance().getApplicationContext().startService(intent);
 
         // Show notification
         showNotification();

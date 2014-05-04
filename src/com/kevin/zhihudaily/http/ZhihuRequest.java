@@ -9,14 +9,14 @@ public class ZhihuRequest {
     public static final String BASE_URL = "http://news.at.zhihu.com/api/2";
 
     /**
-     * ×îĞÂÏûÏ¢
+     * ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢
      */
     public static final String GET_LATEST_NEWS = "/news/latest";
 
     /**
-     * Æô¶¯½çÃæÍ¼Ïñ»ñÈ¡
-     * £¨start-image/ºóµÄÊı×ÖÎªÍ¼ÏñµÄ·Ö±æÂÊ£¬²âÊÔÁËÉÙÊı·Ö±æÂÊ£¬·¢ÏÖ½ÓÊÜÈçÏÂ¼¸ÖÖ
-     * ¸ñÊ½£º320*432£¬480*728£¬720*1184£¬1080*1776¡£Èô¸ñÊ½ÎªÕâĞ©Ö®ÍâµÄ£¬»ñÈ¡µÄÍ¼ÏñÎª¿Õ£©
+     * ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¼ï¿½ï¿½ï¿½È¡
+     * ï¿½ï¿½start-image/ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÎªÍ¼ï¿½ï¿½Ä·Ö±ï¿½ï¿½Ê£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö±ï¿½ï¿½Ê£ï¿½ï¿½ï¿½ï¿½Ö½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Â¼ï¿½ï¿½ï¿½
+     * ï¿½ï¿½Ê½ï¿½ï¿½320*432ï¿½ï¿½480*728ï¿½ï¿½720*1184ï¿½ï¿½1080*1776ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê½Îªï¿½ï¿½Ğ©Ö®ï¿½ï¿½Ä£ï¿½ï¿½ï¿½È¡ï¿½ï¿½Í¼ï¿½ï¿½Îªï¿½Õ£ï¿½
      */
     public static final String GET_START_IMAGE_XH = "/start-image/1080*1776";
 
@@ -27,44 +27,50 @@ public class ZhihuRequest {
     public static final String GET_START_IMAGE_L = "/start-image/320*432";
 
     /**
-     * ¹ıÍùÏûÏ¢£º
+     * ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½
      * http://news.at.zhihu.com/api/2/news/before/20131119 
-     * ËµÃ÷£º
-     * a) Èô¹ûĞèÒª²éÑ¯11ÔÂ18ÈÕµÄÏûÏ¢£¬before/ºóµÄÊı×ÖÓ¦Îª20131119
-     * b) ÖªºõÈÕ±¨µÄÉúÈÕÎª2013Äê5ÔÂ19ÈÕ£¬¹Êbefore/ºóÊı×ÖĞ¡ÓÚ´ËµÄÖ»»á½ÓÊÜµ½¿ÕÏûÏ¢
-     * c) ÊäÈëµÄ½ñÈÕÖ®ºóµÄÈÕÆÚÈÔÈ»»ñµÃ½ñÈÕÄÚÈİ£¬µ«ÊÇ¸ñÊ½²»Í¬ÓÚ×îĞÂÏûÏ¢µÄJSON¸ñÊ½
+     * Ëµï¿½ï¿½ï¿½ï¿½
+     * a) ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Òªï¿½ï¿½Ñ¯11ï¿½ï¿½18ï¿½Õµï¿½ï¿½ï¿½Ï¢ï¿½ï¿½before/ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó¦Îª20131119
+     * b) Öªï¿½ï¿½ï¿½Õ±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Îª2013ï¿½ï¿½5ï¿½ï¿½19ï¿½Õ£ï¿½ï¿½ï¿½before/ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ğ¡ï¿½Ú´Ëµï¿½Ö»ï¿½ï¿½ï¿½ï¿½Üµï¿½ï¿½ï¿½ï¿½ï¿½Ï¢
+     * c) ï¿½ï¿½ï¿½ï¿½Ä½ï¿½ï¿½ï¿½Ö®ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È»ï¿½ï¿½Ã½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½İ£ï¿½ï¿½ï¿½ï¿½Ç¸ï¿½Ê½ï¿½ï¿½Í¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½JSONï¿½ï¿½Ê½
      */
     public static final String GET_OLD_NEWS = "/news/before/";
 
     /**
-     * ÈÈÃÅÏûÏ¢
+     * ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢
      */
     public static final String GET_HOT_NEWS = "/news/hot";
 
     /**
-     * Èí¼şÍÆ¹ã
+     * ï¿½ï¿½ï¿½ï¿½Æ¹ï¿½
      */
     public static final String GET_PROMOTION = "/promotion/android?1386064554385 ";
 
     /**
-     * À¸Ä¿×ÜÀÀ
+     * ï¿½ï¿½Ä¿ï¿½ï¿½ï¿½ï¿½
      *
      */
     public static final String GET_SECTIONS = "/sections";
 
     /**
-     *  À¸Ä¿¾ßÌåÏûÏ¢²é¿´£º
-     *  http://news-at.zhihu.com/api/2/section/1 £¨URL×îºóµÄÊı×Ö²Î¿¼¡ºÀ¸Ä¿×ÜÀÀ¡»ÖĞµÄidÊôĞÔ£©
+     *  ï¿½ï¿½Ä¿ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½é¿´ï¿½ï¿½
+     *  http://news-at.zhihu.com/api/2/section/1 ï¿½ï¿½URLï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö²Î¿ï¿½ï¿½ï¿½ï¿½ï¿½Ä¿ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ğµï¿½idï¿½ï¿½ï¿½Ô£ï¿½
      */
     public static final String GET_SECTION_BY_TYPE = "/section/";
 
     /**
-     *  À¸Ä¿¾ßÌåÏûÏ¢²é¿´£º
-     *  http://news-at.zhihu.com/api/2/section/1 £¨URL×îºóµÄÊı×Ö²Î¿¼¡ºÀ¸Ä¿×ÜÀÀ¡»ÖĞµÄidÊôĞÔ£©
-     *  ÍùÇ°£ºhttp://news-at.zhihu.com/api/2/section/2/before/1384124400 
-     * £¨¼ÓÉÏÒ»¸öÊ±¼ä´Á£¬ÏÂÒ»¸öÊ±¼ä´ÁµÄÊ±¼äÏê¼ûJSONÊı¾İ×îºó£©
+     *  ï¿½ï¿½Ä¿ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½é¿´ï¿½ï¿½
+     *  http://news-at.zhihu.com/api/2/section/1 ï¿½ï¿½URLï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö²Î¿ï¿½ï¿½ï¿½ï¿½ï¿½Ä¿ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ğµï¿½idï¿½ï¿½ï¿½Ô£ï¿½
+     *  ï¿½ï¿½Ç°ï¿½ï¿½http://news-at.zhihu.com/api/2/section/2/before/1384124400 
+     * ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½JSONï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
      */
     public static final String GET_SECTION_BY_DATE = "http://news-at.zhihu.com/api/2/section/2/before/";
+
+    //http://news-at.zhihu.com/api/3/story/3886491/long-comments
+    public static final String GET_LONG_COMMENT = "api/3/story/3886491/long-comments";
+
+    //http://news-at.zhihu.com/api/3/story/3886491/short-comments
+    public static final String GET_SHORT_COMMENT = "api/3/story/3886491/short-comments";
 
     public static ZhihuRequestService getRequestService() {
         if (mRequestService == null) {

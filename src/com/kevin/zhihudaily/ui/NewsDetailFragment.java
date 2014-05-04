@@ -18,6 +18,7 @@ import android.widget.ImageView;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import com.baidu.mobstat.StatService;
 import com.kevin.zhihudaily.Constants;
 import com.kevin.zhihudaily.R;
 import com.kevin.zhihudaily.ZhihuDailyApplication;
@@ -105,6 +106,14 @@ public class NewsDetailFragment extends Fragment implements SwipeRefreshLayout.O
         super.onResume();
         // set up views
         //        setupViews();
+        StatService.onResume(this);
+    }
+
+    @Override
+    public void onPause() {
+        // TODO Auto-generated method stub
+        super.onPause();
+        StatService.onPause(this);
     }
 
     private void initViews() {
