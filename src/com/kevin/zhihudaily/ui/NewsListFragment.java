@@ -1,5 +1,6 @@
 package com.kevin.zhihudaily.ui;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -86,7 +87,6 @@ public class NewsListFragment extends Fragment implements SwipeRefreshLayout.OnR
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // TODO Auto-generated method stub
-        Log.d(TAG, "==onCreateViewonCreateView==");
         mRootView = inflater.inflate(R.layout.fragment_news_list, container, false);
         return mRootView;
         // return super.onCreateView(inflater, container, savedInstanceState);
@@ -95,7 +95,6 @@ public class NewsListFragment extends Fragment implements SwipeRefreshLayout.OnR
     @Override
     public void onDestroyView() {
         // TODO Auto-generated method stub
-        Log.d(TAG, "==onDestroyView==");
         super.onDestroyView();
 
         mRootView = null;
@@ -154,7 +153,7 @@ public class NewsListFragment extends Fragment implements SwipeRefreshLayout.OnR
 
         mFlowAdapter = new TopStoryAdapter(getActivity());
         mViewFlow = (HeaderViewFlow) mHeaderView.findViewById(R.id.viewflow);
-        mViewFlow.setAdapter(mFlowAdapter);
+        mViewFlow.setAdapter(mFlowAdapter, 5);
         mViewFlow.setOnItemClickListener(new OnItemClickListener() {
 
             @Override
@@ -184,12 +183,13 @@ public class NewsListFragment extends Fragment implements SwipeRefreshLayout.OnR
         String todayDate = formatter.format(mTodayDate);
         mIndexDate = mTodayDate;
         mTodayDateString = todayDate;
-        updateNewsList(todayDate, true);
+        requestNewsList(todayDate, true);
 
     }
 
-    private void updateNewsList(String date, boolean isToday) {
+    private void requestNewsList(String date, boolean isToday) {
         if (ZhihuDailyApplication.sIsConnected) {
+            Log.d(TAG, "==NET-Mode==" + date);
             if (isToday) {
                 Intent intent = new Intent(getActivity(), DataService.class);
                 intent.putExtra(Constants.INTENT_ACTION_TYPE, Constants.ACTION_GET_TODAY_NEWS);
@@ -202,7 +202,8 @@ public class NewsListFragment extends Fragment implements SwipeRefreshLayout.OnR
             }
 
         } else {
-            Log.e(TAG, "==DB-Mode==" + date);
+            Log.d(TAG, "==DB-Mode==" + date);
+            date = getPreDateString(date, "yyyyMMdd");
             readLastestNewsFromDB(date);
         }
 
@@ -237,7 +238,43 @@ public class NewsListFragment extends Fragment implements SwipeRefreshLayout.OnR
     public void onRefresh() {
         // TODO Auto-generated method stub
         mIsResetList = true;
-        updateNewsList(mTodayDateString, true);
+        requestNewsList(mTodayDateString, true);
+    }
+
+    public String calendarToString(Calendar calendar, String dateFormat) {
+        if (calendar == null || dateFormat == null) {
+            return null;
+        }
+
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(dateFormat, Locale.CHINA);
+        return simpleDateFormat.format(calendar.getTime());
+    }
+
+    public Calendar stringToCalendar(String dateString, String dateFormat) {
+        if (dateString == null || dateFormat == null) {
+            return null;
+        }
+
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(dateFormat, Locale.CHINA);
+        try {
+            simpleDateFormat.parse(dateString);
+        } catch (ParseException e) {
+            return null;
+        }
+        return simpleDateFormat.getCalendar();
+    }
+
+    private String getPreDateString(String dateString, String dateFormat) {
+        String preDataString = null;
+        if (dateString == null || dateFormat == null) {
+            return null;
+        }
+
+        Calendar calendar = stringToCalendar(dateString, dateFormat);
+        calendar.add(Calendar.DATE, -1);
+
+        preDataString = calendarToString(calendar, dateFormat);
+        return preDataString;
     }
 
     private OnScrollListener mOnScrollListener = new OnScrollListener() {
@@ -245,24 +282,17 @@ public class NewsListFragment extends Fragment implements SwipeRefreshLayout.OnR
         @Override
         public void onScrollStateChanged(AbsListView view, int scrollState) {
             // TODO Auto-generated method stub
-            //��������ʱ
             if (scrollState == AbsListView.OnScrollListener.SCROLL_STATE_IDLE) {
-
-                //�жϹ������ײ�
                 if (view.getLastVisiblePosition() == (view.getCount() - 1)) {
-                    //                    if (!mOrderInfoModel.isLoadComplete() && !mController.isLoadingNow()) {
-                    // �������ײ�
                     mFooterView.setVisibility(View.VISIBLE);
                     mListView.setSelection(view.getCount() - 1);
-                    // �����������
+                    // calculate date
                     Calendar calendar = Calendar.getInstance();
                     calendar.add(Calendar.DATE, 0 - preDays);
-                    SimpleDateFormat sf = new SimpleDateFormat("yyyyMMdd");
-                    String str = sf.format(calendar.getTime());
-                    Log.d(TAG, "==preDate==" + str);
-                    updateNewsList(str, false);
+                    String date = calendarToString(calendar, "yyyyMMdd");
+                    Log.d(TAG, "==preDate==" + date);
+                    requestNewsList(date, false);
                     preDays++;
-                    //                    }
                 }
             }
         }
