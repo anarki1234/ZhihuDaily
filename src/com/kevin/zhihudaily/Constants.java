@@ -15,6 +15,7 @@ public class Constants {
     public static final int ACTION_START_OFFLINE_DOWNLOAD = 0x08;
     public static final int ACTION_GET_LONG_COMMENTS = 0x09;
     public static final int ACTION_GET_SHORT_COMMENTS = 0x10;
+    public static final int ACTION_READ_LASTEST_NEWS = 0x11;
 
     public static final String INTENT_NEWS_NUM = "news_num";
     public static final String INTENT_NEWS_INDEX = "news_index";

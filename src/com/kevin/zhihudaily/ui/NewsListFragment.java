@@ -23,7 +23,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,6 +34,7 @@ import android.widget.ListView;
 
 import com.baidu.mobstat.StatService;
 import com.kevin.zhihudaily.Constants;
+import com.kevin.zhihudaily.DebugLog;
 import com.kevin.zhihudaily.R;
 import com.kevin.zhihudaily.ZhihuDailyApplication;
 import com.kevin.zhihudaily.db.DataBaseManager;
@@ -47,8 +47,6 @@ import com.kevin.zhihudaily.view.HeaderViewFlow;
 import com.kevin.zhihudaily.view.TopStoryAdapter;
 
 public class NewsListFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
-
-    protected static final String TAG = "NewsListFragment";
 
     private View mRootView;
 
@@ -77,7 +75,7 @@ public class NewsListFragment extends Fragment implements SwipeRefreshLayout.OnR
 
     private Date mTodayDate;
     private String mTodayDateString;
-    private Date mIndexDate;
+    private String mIndexDate;
     private int preDays = 0;
 
     NotificationCompat.Builder mNotifyBuilder;
@@ -159,7 +157,7 @@ public class NewsListFragment extends Fragment implements SwipeRefreshLayout.OnR
             @Override
             public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
                 // TODO Auto-generated method stub
-                Log.e(TAG, "==OnItemClickListener== arg2:" + arg2);
+                DebugLog.e("==OnItemClickListener== arg2:" + arg2);
             }
         });
 
@@ -181,7 +179,7 @@ public class NewsListFragment extends Fragment implements SwipeRefreshLayout.OnR
         // request latest news
         SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd", Locale.CHINA);
         String todayDate = formatter.format(mTodayDate);
-        mIndexDate = mTodayDate;
+        mIndexDate = todayDate;
         mTodayDateString = todayDate;
         requestNewsList(todayDate, true);
 
@@ -189,7 +187,7 @@ public class NewsListFragment extends Fragment implements SwipeRefreshLayout.OnR
 
     private void requestNewsList(String date, boolean isToday) {
         if (ZhihuDailyApplication.sIsConnected) {
-            Log.d(TAG, "==NET-Mode==" + date);
+            DebugLog.d("==NET-Mode==" + date);
             if (isToday) {
                 Intent intent = new Intent(getActivity(), DataService.class);
                 intent.putExtra(Constants.INTENT_ACTION_TYPE, Constants.ACTION_GET_TODAY_NEWS);
@@ -202,14 +200,27 @@ public class NewsListFragment extends Fragment implements SwipeRefreshLayout.OnR
             }
 
         } else {
-            Log.d(TAG, "==DB-Mode==" + date);
-            date = getPreDateString(date, "yyyyMMdd");
-            readLastestNewsFromDB(date);
+            DebugLog.d("==DB-Mode==" + date);
+            if (isToday) {
+                readLastestNewsFromDB();
+            } else {
+                date = getPreDateString(date, "yyyyMMdd");
+                DebugLog.d("==PreDate==" + date);
+                readNewsFromDBByDate(date);
+            }
         }
 
     }
 
-    private void readLastestNewsFromDB(String date) {
+    private void readLastestNewsFromDB() {
+        // Read db data
+        Intent intent = new Intent(getActivity(), DataService.class);
+        intent.putExtra(Constants.INTENT_ACTION_TYPE, Constants.ACTION_READ_LASTEST_NEWS);
+        //        intent.putExtra(Constants.INTENT_NEWS_DATE, date);
+        getActivity().startService(intent);
+    }
+
+    private void readNewsFromDBByDate(String date) {
         // Read db data
         Intent intent = new Intent(getActivity(), DataService.class);
         intent.putExtra(Constants.INTENT_ACTION_TYPE, Constants.ACTION_READ_DAILY_NEWS);
@@ -228,7 +239,7 @@ public class NewsListFragment extends Fragment implements SwipeRefreshLayout.OnR
             intent.putExtra(Constants.INTENT_NEWS_NUM, item.getSectionSize());
             intent.putExtra(Constants.INTENT_NEWS_INDEX, item.getIndexOfDay());
             intent.putExtra(Constants.INTENT_NEWS_DATE, item.getDate());
-            Log.d(TAG, "==index=" + item.getIndexOfDay() + "==pos=" + position);
+            DebugLog.d("==index=" + item.getIndexOfDay() + "==pos=" + position);
 
             startActivity(intent);
         }
@@ -286,11 +297,14 @@ public class NewsListFragment extends Fragment implements SwipeRefreshLayout.OnR
                 if (view.getLastVisiblePosition() == (view.getCount() - 1)) {
                     mFooterView.setVisibility(View.VISIBLE);
                     mListView.setSelection(view.getCount() - 1);
+
                     // calculate date
-                    Calendar calendar = Calendar.getInstance();
-                    calendar.add(Calendar.DATE, 0 - preDays);
-                    String date = calendarToString(calendar, "yyyyMMdd");
-                    Log.d(TAG, "==preDate==" + date);
+                    //                    Calendar calendar = Calendar.getInstance();
+                    //                    calendar.add(Calendar.DATE, 0 - preDays);
+                    //                    String date = calendarToString(calendar, "yyyyMMdd");
+                    String date = mIndexDate;
+
+                    DebugLog.d("==preDate==" + date);
                     requestNewsList(date, false);
                     preDays++;
                 }
@@ -338,6 +352,11 @@ public class NewsListFragment extends Fragment implements SwipeRefreshLayout.OnR
             int action_type = intent.getIntExtra(Constants.INTENT_ACTION_TYPE, -1);
             if (action_type != Constants.ACTION_START_OFFLINE_DOWNLOAD) {
                 String date = intent.getStringExtra(Constants.EXTRA_CACHE_KEY);
+
+                // update index date
+                mIndexDate = date;
+                DebugLog.d("==Index date==" + mIndexDate);
+
                 DailyNewsModel model = DataCache.getInstance().getDailyNewsModel(date);
 
                 updateNewsList(model);

@@ -51,6 +51,9 @@ public class DataCache {
     }
 
     public DailyNewsModel getDailyNewsModel(String key) {
+        if (key == null) {
+            return null;
+        }
         return mDailyMap.get(key.hashCode());
     }
 

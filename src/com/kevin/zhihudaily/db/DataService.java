@@ -11,6 +11,7 @@ import android.content.Intent;
 import android.util.Log;
 
 import com.kevin.zhihudaily.Constants;
+import com.kevin.zhihudaily.DebugLog;
 import com.kevin.zhihudaily.http.BroadcastNotifier;
 import com.kevin.zhihudaily.http.ZhihuRequest;
 import com.kevin.zhihudaily.model.CommentsModel;
@@ -80,6 +81,16 @@ public class DataService extends IntentService {
                 mBroadcastNotifier.notifyDailyNewsDataReady(date);
             }
             break;
+        case Constants.ACTION_READ_LASTEST_NEWS:
+            DailyNewsModel lastestNewsModel = DataBaseManager.getInstance().readLastestNewsList();
+            DebugLog.e("==Model size==" + lastestNewsModel.toString());
+            if (lastestNewsModel != null) {
+                DataCache.getInstance().addDailyCache(lastestNewsModel.getDate(), lastestNewsModel);
+
+                // notify ui to update
+                mBroadcastNotifier.notifyDailyNewsDataReady(lastestNewsModel.getDate());
+            }
+            break;
         case Constants.ACTION_READ_NEWS_DEATIL:
             if (date == null || id == -1) {
                 break;
@@ -120,27 +131,32 @@ public class DataService extends IntentService {
 
     private void requestTodayNews() {
         //        Log.d(TAG, "==IN=" + SystemClock.currentThreadTimeMillis());
-        DailyNewsModel model = ZhihuRequest.getRequestService().getDailyNewsToday();
+        try {
+            DailyNewsModel model = ZhihuRequest.getRequestService().getDailyNewsToday();
+
+            if (model != null) {
+                int newTimeStamp = Integer.valueOf(model.getNewsList().get(0).getGa_prefix());
+
+                int dataStatus = DataBaseManager.getInstance().checkDataExpire(newTimeStamp);
+                if (dataStatus >= 0) {
+                    if (dataStatus > 0) {
+                        // update timestamp
+                        DataBaseManager.getInstance().setDataTimeStamp(newTimeStamp);
+                    }
+
+                    DataCache.getInstance().addDailyCache(model.getDate(), model);
+
+                    // notify ui to update
+                    mBroadcastNotifier.notifyDailyNewsDataReady(model.getDate());
+                }
+
+            }
+        } catch (Exception e) {
+            // TODO: handle exception
+        }
         //        Log.d(TAG, "==Model=" + model.getDisplay_date());
         //        Log.d(TAG, "==OUT=" + SystemClock.currentThreadTimeMillis());
 
-        if (model != null) {
-            int newTimeStamp = Integer.valueOf(model.getNewsList().get(0).getGa_prefix());
-
-            int dataStatus = DataBaseManager.getInstance().checkDataExpire(newTimeStamp);
-            if (dataStatus >= 0) {
-                if (dataStatus > 0) {
-                    // update timestamp
-                    DataBaseManager.getInstance().setDataTimeStamp(newTimeStamp);
-                }
-
-                DataCache.getInstance().addDailyCache(model.getDate(), model);
-
-                // notify ui to update
-                mBroadcastNotifier.notifyDailyNewsDataReady(model.getDate());
-            }
-
-        }
     }
 
     private void requestDailyNewsByDate(String date) {

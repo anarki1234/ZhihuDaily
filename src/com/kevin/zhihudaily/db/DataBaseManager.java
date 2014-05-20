@@ -12,14 +12,13 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.util.Log;
 import android.util.SparseBooleanArray;
 
+import com.kevin.zhihudaily.DebugLog;
 import com.kevin.zhihudaily.model.DailyNewsModel;
 import com.kevin.zhihudaily.model.NewsModel;
 
 public class DataBaseManager {
-    private static final String TAG = "DataBaseManager";
     private DataBaseHelper mHelper;
     private SQLiteDatabase db;
     private static DataBaseManager mInstance;
@@ -46,7 +45,7 @@ public class DataBaseManager {
     }
 
     public void closeDB() {
-        Log.e(TAG, "==closeDB==");
+        DebugLog.e("==closeDB==");
         new Exception().printStackTrace();
         db.close();
         // mHelper = null;
@@ -88,7 +87,7 @@ public class DataBaseManager {
     }
 
     public int writeDailyNewsToDB(DailyNewsModel dailyNewsModel) {
-        Log.d(TAG, "==writeDailyNewsToDB==START");
+        DebugLog.d("==writeDailyNewsToDB==START");
         int count = 0;
         if (dailyNewsModel == null) {
             return 0;
@@ -140,12 +139,12 @@ public class DataBaseManager {
         } finally {
             db.endTransaction();
         }
-        Log.d(TAG, "==writeDailyNewsToDB==END");
+        DebugLog.d("==writeDailyNewsToDB==END");
         return count;
     }
 
     public int writeNewsToDB(NewsModel model) {
-        Log.d(TAG, "==writeNewsToDB");
+        DebugLog.d("==writeNewsToDB");
         int count = 0;
         if (model == null) {
             return 0;
@@ -199,7 +198,7 @@ public class DataBaseManager {
             db.setTransactionSuccessful();
         } catch (Exception e) {
             // TODO: handle exception
-            Log.e(TAG, "==Exception==" + e.toString());
+            DebugLog.e("==Exception==" + e.toString());
         } finally {
             db.endTransaction();
         }
@@ -207,7 +206,7 @@ public class DataBaseManager {
     }
 
     public int updateNewsListToDB(List<NewsModel> list) {
-        Log.d(TAG, "==updateNewsListToDB==START");
+        DebugLog.d("==updateNewsListToDB==START");
         int count = 0;
         if (list == null || list.size() <= 0) {
             return 0;
@@ -227,7 +226,7 @@ public class DataBaseManager {
                     values.put(DataBaseConstants.IMAGE_SOURCE, imageSource);
                 }
                 String[] whereArgs = { String.valueOf(newsModel.getId()) };
-                Log.d(TAG, "==imageSource=" + imageSource);
+                DebugLog.d("==imageSource=" + imageSource);
                 count = db.updateWithOnConflict(DataBaseConstants.NEWS_TABLE_NAME, values, DataBaseConstants.ID + "=?",
                         whereArgs, SQLiteDatabase.CONFLICT_REPLACE);
             }
@@ -236,11 +235,11 @@ public class DataBaseManager {
 
         } catch (Exception e) {
             // TODO: handle exception
-            Log.e(TAG, "==Exception==" + e.toString());
+            DebugLog.e("==Exception==" + e.toString());
         } finally {
             db.endTransaction();
         }
-        Log.d(TAG, "==updateNewsListToDB==END");
+        DebugLog.d("==updateNewsListToDB==END");
         return count;
     }
 
@@ -269,9 +268,76 @@ public class DataBaseManager {
                 // Log.d(TAG, "==id=" + model.getId());
                 model.setDate(cursor.getString(cursor.getColumnIndexOrThrow(DataBaseConstants.DATE)));
                 model.setGa_prefix(cursor.getString(cursor.getColumnIndexOrThrow(DataBaseConstants.GA_PREFIX)));
-                // Log.d(TAG, "==ga_prefix=" + model.getGa_prefix());
                 model.setIs_top_story(cursor.getInt(cursor.getColumnIndexOrThrow(DataBaseConstants.IS_TOP_STORY)));
                 model.setTitle(cursor.getString(cursor.getColumnIndexOrThrow(DataBaseConstants.TITLE)));
+                DebugLog.d("==id=" + model.getTitle());
+                model.setUrl(cursor.getString(cursor.getColumnIndexOrThrow(DataBaseConstants.URL)));
+                model.setImage_source(cursor.getString(cursor.getColumnIndexOrThrow(DataBaseConstants.IMAGE_SOURCE)));
+                model.setImage(cursor.getString(cursor.getColumnIndexOrThrow(DataBaseConstants.IMAGE_URL)));
+                model.setThumbnail(cursor.getString(cursor.getColumnIndexOrThrow(DataBaseConstants.IMAGE_THUMBNAIL)));
+                model.setShare_url(cursor.getString(cursor.getColumnIndexOrThrow(DataBaseConstants.SHARE_URL)));
+
+                // read body
+                model.setBody(cursor.getString(cursor.getColumnIndexOrThrow(DataBaseConstants.BODY)));
+
+                newsList.add(model);
+                if (model.isIs_top_story() == 1) {
+                    topStories.add(model);
+                }
+            }
+            dailyModel.setNewsList(newsList);
+            dailyModel.setTopStories(topStories);
+            String dateString = newsList.get(0).getDate();
+            dailyModel.setDate(dateString);
+            // convert string to date
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd");
+            try {
+                Date dateTime = formatter.parse(dateString);
+                SimpleDateFormat diaplayFormat = new SimpleDateFormat("yyyy.M.d cccc");
+                String displayDate = diaplayFormat.format(dateTime);
+                dailyModel.setDisplay_date(displayDate);
+            } catch (ParseException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            cursor.close();
+        }
+        return dailyModel;
+    }
+
+    public DailyNewsModel readLastestNewsList() {
+        DailyNewsModel dailyModel = null;
+        if (!db.isOpen()) {
+            db = mHelper.getReadableDatabase();
+        }
+
+        String date = getLastestNewsDate();
+        if (date == null) {
+            return null;
+        }
+
+        String[] columns = { DataBaseConstants.ID, DataBaseConstants.DATE, DataBaseConstants.GA_PREFIX,
+                DataBaseConstants.IS_TOP_STORY, DataBaseConstants.TITLE, DataBaseConstants.URL,
+                DataBaseConstants.IMAGE_SOURCE, DataBaseConstants.IMAGE_URL, DataBaseConstants.IMAGE_THUMBNAIL,
+                DataBaseConstants.SHARE_URL, DataBaseConstants.BODY };
+        String selection = "date=?";
+        String[] selectionArgs = { date };
+        String orderBy = DataBaseConstants.GA_PREFIX + " DESC" + ", " + DataBaseConstants.ID + " DESC";
+        Cursor cursor = db.query(DataBaseConstants.NEWS_TABLE_NAME, columns, selection, selectionArgs, null, null,
+                orderBy);
+        if (cursor != null && cursor.getCount() > 0) {
+            dailyModel = new DailyNewsModel();
+            ArrayList<NewsModel> newsList = new ArrayList<NewsModel>();
+            ArrayList<NewsModel> topStories = new ArrayList<NewsModel>();
+            while (cursor.moveToNext()) {
+                NewsModel model = new NewsModel();
+                model.setId(cursor.getInt(cursor.getColumnIndexOrThrow(DataBaseConstants.ID)));
+                // Log.d(TAG, "==id=" + model.getId());
+                model.setDate(cursor.getString(cursor.getColumnIndexOrThrow(DataBaseConstants.DATE)));
+                model.setGa_prefix(cursor.getString(cursor.getColumnIndexOrThrow(DataBaseConstants.GA_PREFIX)));
+                model.setIs_top_story(cursor.getInt(cursor.getColumnIndexOrThrow(DataBaseConstants.IS_TOP_STORY)));
+                model.setTitle(cursor.getString(cursor.getColumnIndexOrThrow(DataBaseConstants.TITLE)));
+                DebugLog.d("==id=" + model.getTitle());
                 model.setUrl(cursor.getString(cursor.getColumnIndexOrThrow(DataBaseConstants.URL)));
                 model.setImage_source(cursor.getString(cursor.getColumnIndexOrThrow(DataBaseConstants.IMAGE_SOURCE)));
                 model.setImage(cursor.getString(cursor.getColumnIndexOrThrow(DataBaseConstants.IMAGE_URL)));
@@ -320,7 +386,7 @@ public class DataBaseManager {
         if (cursor != null && cursor.getCount() > 0 && cursor.moveToFirst()) {
             // read body
             body = cursor.getString(cursor.getColumnIndexOrThrow(DataBaseConstants.BODY));
-            Log.d(TAG, "==body=" + body);
+            DebugLog.d("==body=" + body);
             cursor.close();
         }
         return body;
@@ -347,5 +413,25 @@ public class DataBaseManager {
             cursor.close();
         }
         return model;
+    }
+
+    public String getLastestNewsDate() {
+        String date = null;
+        if (!db.isOpen()) {
+            db = mHelper.getReadableDatabase();
+        }
+
+        String[] columns = { DataBaseConstants.DATE };
+        String orderBy = "date";
+        String groupBy = "date";
+        Cursor cursor = db.query(true, DataBaseConstants.NEWS_TABLE_NAME, columns, null, null, groupBy, null, orderBy,
+                null);
+        if (cursor != null && cursor.getCount() > 0 && cursor.moveToFirst()) {
+            // read lastest date
+            date = cursor.getString(cursor.getColumnIndexOrThrow(DataBaseConstants.DATE));
+            DebugLog.d("==last date=" + date);
+            cursor.close();
+        }
+        return date;
     }
 }
