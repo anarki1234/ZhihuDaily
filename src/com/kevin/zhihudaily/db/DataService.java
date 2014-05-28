@@ -8,7 +8,6 @@ import java.util.Locale;
 
 import android.app.IntentService;
 import android.content.Intent;
-import android.util.Log;
 
 import com.kevin.zhihudaily.Constants;
 import com.kevin.zhihudaily.DebugLog;
@@ -33,20 +32,17 @@ public class DataService extends IntentService {
     public void onCreate() {
         // TODO Auto-generated method stub
         super.onCreate();
-        Log.e(TAG, "==onCreate");
     }
 
     @Override
     public void onDestroy() {
         // TODO Auto-generated method stub
         super.onDestroy();
-        Log.e(TAG, "==onDestroy");
     }
 
     @Override
     protected void onHandleIntent(Intent intent) {
         // TODO Auto-generated method stub
-        Log.e(TAG, "==onHandleIntent");
         int action = intent.getIntExtra(Constants.INTENT_ACTION_TYPE, -1);
         int id = intent.getIntExtra(Constants.INTENT_NEWS_ID, -1);
         String date = intent.getStringExtra(Constants.INTENT_NEWS_DATE);
@@ -98,7 +94,7 @@ public class DataService extends IntentService {
             //            String news_body = DataBaseManager.getInstance().readNewsBody(news_id);
             NewsModel model = DataBaseManager.getInstance().readNewsBodyAndImageSource(id);
             if (model != null) {
-                // Update to cache
+                // Update to db
                 DataCache.getInstance().updateNewsDetailByID(date, id, model.getBody(), model.getImage_source());
 
                 // Notify ui to update
@@ -191,13 +187,21 @@ public class DataService extends IntentService {
             model = ZhihuRequest.getRequestService().getDailyNewsToday();
         } else {
             model = ZhihuRequest.getRequestService().getDailyNewsByDate(date);
-
         }
+
         if (model != null) {
 
-            int newTimeStamp = Integer.valueOf(model.getNewsList().get(0).getGa_prefix());
-            if (DataBaseManager.getInstance().checkDataExpire(newTimeStamp) >= 0) {
+            //            int newTimeStamp = Integer.valueOf(model.getNewsList().get(0).getGa_prefix());
+            //            if (DataBaseManager.getInstance().checkDataExpire(newTimeStamp) >= 0) {
+            //                return;
+            //            }
 
+            ArrayList<Integer> lacklist = (ArrayList<Integer>) DataBaseManager.getInstance()
+                    .getNewsDetailLackList(date);
+            if (lacklist == null || lacklist.size() == 0) {
+                // notify ui to update
+                mBroadcastNotifier.notifyProgress(100);
+                return;
             }
 
             DataBaseManager.getInstance().writeDailyNewsToDB(model);
@@ -207,15 +211,17 @@ public class DataService extends IntentService {
             if (size > 0) {
                 int incr = 100 / size + 1;
                 int progress = 0;
-                //                ArrayList<NewsModel> newslist = new ArrayList<NewsModel>();
+                ArrayList<NewsModel> newslist = new ArrayList<NewsModel>();
                 for (NewsModel news : list) {
                     news = ZhihuRequest.getRequestService().getNewsById(news.getId());
-                    //                    newslist.add(news);
-                    if (news != null) {
-                        //                        Log.d(TAG, "==startOfflineDownload  image_source" + news.getImage_source());
-                        DataBaseManager.getInstance().updateNewsBodyToDB(news.getId(), news.getBody(),
-                                news.getImage_source());
-                    }
+                    newslist.add(news);
+
+                    // Update new body to db one by one
+                    //                    if (news != null) {
+                    //                        //                        Log.d(TAG, "==startOfflineDownload  image_source" + news.getImage_source());
+                    //                        DataBaseManager.getInstance().updateNewsBodyToDB(news.getId(), news.getBody(),
+                    //                                news.getImage_source());
+                    //                    }
 
                     // notify ui to update
                     progress += incr;
@@ -224,7 +230,7 @@ public class DataService extends IntentService {
                 }
 
                 // Write to DB
-                //                DataBaseManager.getInstance().updateNewsListToDB(newslist);
+                DataBaseManager.getInstance().updateNewsListToDB(newslist);
 
                 // notify ui to update
                 mBroadcastNotifier.notifyProgress(100);

@@ -226,7 +226,6 @@ public class DataBaseManager {
                     values.put(DataBaseConstants.IMAGE_SOURCE, imageSource);
                 }
                 String[] whereArgs = { String.valueOf(newsModel.getId()) };
-                DebugLog.d("==imageSource=" + imageSource);
                 count = db.updateWithOnConflict(DataBaseConstants.NEWS_TABLE_NAME, values, DataBaseConstants.ID + "=?",
                         whereArgs, SQLiteDatabase.CONFLICT_REPLACE);
             }
@@ -433,5 +432,33 @@ public class DataBaseManager {
             cursor.close();
         }
         return date;
+    }
+
+    public List<Integer> getNewsDetailLackList(String date) {
+        ArrayList<Integer> lacklist = null;
+        if (!db.isOpen()) {
+            db = mHelper.getReadableDatabase();
+        }
+
+        if (date == null) {
+            return null;
+        }
+
+        String[] columns = { DataBaseConstants.ID, DataBaseConstants.DATE, DataBaseConstants.BODY };
+        String selection = "body=?";
+        String[] selectionArgs = { "" };
+        Cursor cursor = db
+                .query(DataBaseConstants.NEWS_TABLE_NAME, columns, selection, selectionArgs, null, null, null);
+        if (cursor != null && cursor.getCount() > 0) {
+            lacklist = new ArrayList<Integer>();
+            while (cursor.moveToNext()) {
+                NewsModel model = new NewsModel();
+                int id = cursor.getInt(cursor.getColumnIndexOrThrow(DataBaseConstants.ID));
+                DebugLog.d("==id=" + model.getId());
+                lacklist.add(id);
+            }
+            cursor.close();
+        }
+        return lacklist;
     }
 }
