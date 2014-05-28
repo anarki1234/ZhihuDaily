@@ -1,22 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-   <color name="grey">#eeeeee</color> 
-   <color name="alpha_grey">#f8a89a</color>
-   <color name="alpha_orange">#fac0b6</color>
-   <color name="orange">#f26149</color>
-   <color name="orange_light">#f26149</color>
-   <color name="orange_dark">#ea5941</color>
-   <color name="blue_lignt">#425a71</color>
-   <color name="blue_dark">#3a5276</color>
-   <color name="cyan_light">#799cc7</color>
-   <color name="cyan_mid">#799fb2</color>
-   <color name="cyan_dark">#819fba</color>
-   <color name="grey_dark">#666666</color>
-   <color name="grey_light">#a8a8a8</color>
-   <color name="grey_transparent">#f0dfdfdf</color>
-   <color name="black_transprent">#10de4d35</color>
-   <color name="white">#ffffff</color>
-   <color name="black">#000000</color>
-<!--    <color name="blue_main">#006cbb</color> -->
-   <color name="blue_main">#33b5e5</color>
+	<color name="grey">#eeeeee</color> 
+	<color name="alpha_grey">#f8a89a</color>
+	<color name="alpha_orange">#fac0b6</color>
+	<color name="orange">#f26149</color>
+	<color name="orange_light">#f26149</color>
+	<color name="orange_dark">#ea5941</color>
+	<color name="blue_lignt">#425a71</color>
+	<color name="blue_dark">#3a5276</color>
+	<color name="cyan_light">#799cc7</color>
+	<color name="cyan_mid">#799fb2</color>
+	<color name="cyan_dark">#819fba</color>
+	<color name="grey_dark">#666666</color>
+	<color name="grey_light">#a8a8a8</color>
+	<color name="grey_transparent">#f0dfdfdf</color>
+	<color name="black_transprent">#10de4d35</color>
+	<color name="white">#ffffff</color>
+	<color name="black">#000000</color>
+	<!--    <color name="blue_main">#006cbb</color> -->
+	<color name="blue_main">#33b5e5</color>
+   
+	<!-- Comment -->
+   	<color name="comment_header">#333333</color>
+	<color name="comment_header_dark">#B8B8B8</color>
+	<color name="comment_item_author">#333333</color>
+	<color name="comment_item_author_dark">#666666</color>
+	<color name="comment_item_content">#666666</color>
+	<color name="comment_item_time">#B8B8B8</color>
+
+	<color name="comment_compose_text">#CECECE</color>
+
+	<color name="comment_no_comment_prompt_text">#e4e4e4</color>
+	<color name="comment_no_comment_prompt_text_dark">#505050</color>
+	<!-- Comment -->
 </resources>

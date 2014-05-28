@@ -5,7 +5,6 @@ import android.os.SystemClock;
 
 import com.kevin.zhihudaily.db.DataBaseManager;
 import com.kevin.zhihudaily.db.DataCache;
-import com.kevin.zhihudaily.imageutil.Utils;
 
 public class ZhihuDailyApplication extends Application {
 

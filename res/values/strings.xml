@@ -6,6 +6,7 @@
     <string name="title_news_detail">NewsDetail</string>
     <string name="title_settings">设置</string>
     <string name="title_about">关于</string>
+    <string name="title_comment">评论</string>
     <string-array name="menu_array">
         <item>设置</item>
         <item>关于</item>
@@ -18,9 +19,9 @@
     <string name="no_network_connection_toast">No network connection found</string>
     
     <string name="loading">Loading...</string>
-    <string name="data_cache">Data Cache</string>
-    <string name="data_cache_inprocess">Downloading...</string>
-    <string name="data_cache_complete">Downloading Completed</string>
+    <string name="data_cache">离线内容</string>
+    <string name="data_cache_inprocess">下载中...</string>
+    <string name="data_cache_complete">下载完成</string>
     
     <!-- Settings -->
     <string name="wifi_auto_download">自动离线下载</string>
@@ -29,4 +30,9 @@
     
     <string name="stat_event_app_live">app_live</string>
     <string name="stat_label_app_live">应用使用时长</string>
+    
+    <!-- Comment -->
+    <string name="action_share">分享</string>
+    <string name="action_comment">评论</string>
+    <string name="comment_no_comment">深度长评虚位以待</string>
 </resources>

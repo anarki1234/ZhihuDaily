@@ -18,6 +18,8 @@ import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.support.v7.app.ActionBarActivity;
 import android.util.DisplayMetrics;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
@@ -25,15 +27,19 @@ import android.view.Window;
 import com.baidu.mobstat.StatService;
 import com.kevin.zhihudaily.BuildConfig;
 import com.kevin.zhihudaily.Constants;
+import com.kevin.zhihudaily.DebugLog;
 import com.kevin.zhihudaily.R;
+import com.kevin.zhihudaily.Utils;
 import com.kevin.zhihudaily.db.DataCache;
-import com.kevin.zhihudaily.imageutil.Utils;
 import com.kevin.zhihudaily.model.DailyNewsModel;
 import com.kevin.zhihudaily.model.NewsModel;
 
 public class NewsDetailActivity extends ActionBarActivity implements OnClickListener {
 
     private static final String TAG = "NewsDetailActivity";
+
+    private static final String DATE_KEY = "date_key";
+
     private DetailPagerAdapter mAdapter;
     private ViewPager mPager;
     private Drawable mActionBarDrawable;
@@ -41,6 +47,7 @@ public class NewsDetailActivity extends ActionBarActivity implements OnClickList
     private DailyNewsModel mDailyNewsModel;
     private int mNewsNum = 1;
     private NewsModel mSelectModel = new NewsModel();
+    private String mDateKey;
 
     @SuppressLint("NewApi")
     @Override
@@ -50,7 +57,7 @@ public class NewsDetailActivity extends ActionBarActivity implements OnClickList
             Utils.enableStrictMode();
         }
         super.onCreate(savedInstanceState);
-
+        DebugLog.d("==onCreate==  bundle" + savedInstanceState);
         requestWindowFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
         setContentView(R.layout.activity_news_detail);
 
@@ -62,7 +69,8 @@ public class NewsDetailActivity extends ActionBarActivity implements OnClickList
         final int width = displayMetrics.widthPixels;
 
         Intent intent = getIntent();
-        String dateKey = intent.getStringExtra(Constants.INTENT_NEWS_DATE);
+        DebugLog.d("==onCreate==  intent" + intent);
+        mDateKey = intent.getStringExtra(Constants.INTENT_NEWS_DATE);
         if (intent != null) {
             mNewsNum = intent.getIntExtra(Constants.INTENT_NEWS_NUM, 1);
             mSelectModel.setId(intent.getIntExtra(Constants.INTENT_NEWS_ID, -1));
@@ -72,8 +80,12 @@ public class NewsDetailActivity extends ActionBarActivity implements OnClickList
             mSelectModel.setImage(intent.getStringExtra(Constants.INTENT_NEWS_IMAGE_URL));
         }
 
+        if (savedInstanceState != null) {
+            mDateKey = savedInstanceState.getString(DATE_KEY);
+
+        }
         // Read from cache for viewpager data
-        mDailyNewsModel = DataCache.getInstance().getDailyNewsModel(dateKey);
+        mDailyNewsModel = DataCache.getInstance().getDailyNewsModel(mDateKey);
         mNewsNum = mDailyNewsModel.getNewsList().size();
 
         // Set up ViewPager and backing adapter
@@ -167,6 +179,55 @@ public class NewsDetailActivity extends ActionBarActivity implements OnClickList
         // TODO Auto-generated method stub
         super.onResume();
         StatService.onResume(this);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        // TODO Auto-generated method stub
+        outState.putString(DATE_KEY, mDateKey);
+        DebugLog.d("==onSaveInstanceState==  bundle" + outState.toString());
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        // TODO Auto-generated method stub
+        super.onRestoreInstanceState(savedInstanceState);
+        DebugLog.d("==onRestoreInstanceState==  bundle" + savedInstanceState);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // TODO Auto-generated method stub
+        //        return super.onCreateOptionsMenu(menu);
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // TODO Auto-generated method stub
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+        switch (id) {
+        case R.id.action_comment:
+            gotoComments();
+            break;
+        case R.id.action_share:
+
+            break;
+        default:
+            break;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void gotoComments() {
+        Intent intent = new Intent(this, CommentActivity.class);
+        startActivity(intent);
     }
 
     private class DetailPagerAdapter extends FragmentStatePagerAdapter {
