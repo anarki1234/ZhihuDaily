@@ -17,13 +17,16 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
+import android.view.DragEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnDragListener;
 import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.SlidingDrawer.OnDrawerScrollListener;
 
 import com.baidu.mobstat.StatService;
 import com.kevin.zhihudaily.R;
@@ -95,6 +98,12 @@ public class MainActivity extends ActionBarActivity {
                 getActionBar().setTitle(mDrawerTitle);
                 invalidateOptionsMenu(); // creates call to
                                          // onPrepareOptionsMenu()
+            }
+
+            public void onDrawerSlide(View drawerView, float slideOffet) {
+                int alpha = 0;
+                alpha = (int) (slideOffet * 255);
+                setActionBarAlpha(alpha);
             }
         };
         mDrawerLayout.setDrawerListener(mDrawerToggle);
@@ -189,6 +198,34 @@ public class MainActivity extends ActionBarActivity {
         default:
             return super.onOptionsItemSelected(item);
         }
+    }
+
+    @SuppressWarnings("deprecation")
+    private class DrawerScrollListener implements OnDrawerScrollListener {
+
+        @Override
+        public void onScrollEnded() {
+            // TODO Auto-generated method stub
+
+        }
+
+        @Override
+        public void onScrollStarted() {
+            // TODO Auto-generated method stub
+
+        }
+
+    }
+
+    @SuppressLint("NewApi")
+    private class DragListener implements OnDragListener {
+
+        @Override
+        public boolean onDrag(View v, DragEvent event) {
+            // TODO Auto-generated method stub
+            return false;
+        }
+
     }
 
     /* The click listner for ListView in the navigation drawer */
